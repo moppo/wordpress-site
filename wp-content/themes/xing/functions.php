@@ -628,6 +628,23 @@ function archives_widget_postcount_filter($out) {
 }
 add_filter('get_archives_link', 'archives_widget_postcount_filter');
 
+// custom currency
+add_filter( 'woocommerce_currencies', 'add_my_currency' );
+ 
+function add_my_currency( $currencies ) {
+     $currencies['VND'] = __( 'Viet Nam Dong', 'woocommerce' );
+     return $currencies;
+}
+ 
+add_filter('woocommerce_currency_symbol', 'add_my_currency_symbol', 10, 2);
+ 
+function add_my_currency_symbol( $currency_symbol, $currency ) {
+     switch( $currency ) {
+          case 'VND': $currency_symbol = ''; break;
+     }
+     return $currency_symbol;
+}
+
 // Make theme options variables available for use
 function load_theme_vars() {
 	global $options;
