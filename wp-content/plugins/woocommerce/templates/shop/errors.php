@@ -6,13 +6,10 @@
  * @package 	WooCommerce/Templates
  * @version     1.6.4
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 if ( ! $errors ) return;
 ?>
-<ul class="woocommerce-error">
+<ul class="woocommerce_error">
 	<?php foreach ( $errors as $error ) : ?>
-		<li><?php echo wp_kses_post( $error ); ?></li>
+		<li><?php echo $error; ?></li>
 	<?php endforeach; ?>
 </ul>

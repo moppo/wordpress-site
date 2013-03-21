@@ -425,11 +425,11 @@ ul.products li.product a {
 	text-decoration:none
 }
 ul.products li.product a img {
-	width:174px;
-	height:auto;
+	width:120px;
+	height:120;
 	display:block;
 	border:1px solid #e5e5e5;
-	margin:0 0 9px;
+	margin:auto;
 }
 ul.products li.product a:hover img {
 	border-color:#ccc;

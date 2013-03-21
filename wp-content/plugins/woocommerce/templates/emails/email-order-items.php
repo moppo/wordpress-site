@@ -1,13 +1,13 @@
 <?php
 /**
- * Email Order Items
+ * Email Order Item
+ *
+ * Shows a line item inside the order emails table
  *
  * @author 		WooThemes
  * @package 	WooCommerce/Templates/Emails
- * @version     2.0.3
+ * @version     1.6.4
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 global $woocommerce;
 
@@ -31,26 +31,8 @@ foreach ($items as $item) :
 			// SKU
 			echo 	($show_sku && $_product->get_sku()) ? ' (#' . $_product->get_sku() . ')' : '';
 
-			// File URLs
-			if ( $show_download_links && $_product->exists() && $_product->is_downloadable() ) {
-
-				$download_file_urls = $order->get_downloadable_file_urls( $item['product_id'], $item['variation_id'], $item );
-
-				$i = 0;
-
-				foreach ( $download_file_urls as $file_url => $download_file_url ) {
-					echo '<br/><small>';
-
-					if ( count( $download_file_urls ) > 1 ) {
-						echo sprintf( __('Download %d:', 'woocommerce' ), $i + 1 );
-					} elseif ( $i == 0 )
-						echo __( 'Download:', 'woocommerce' );
-
-					echo ' <a href="' . $download_file_url . '" target="_blank">' . basename( $file_url ) . '</a></small>';
-
-					$i++;
-				}
-			}
+			// File URL
+			echo 	( $show_download_links && $_product->exists() && $_product->is_downloadable() && $_product->has_file() ) ? '<br/><small>' . __( 'Download:', 'woocommerce' ) . ' <a href="' . $order->get_downloadable_file_url( $item['id'], $item['variation_id'] ) . '" target="_blank">' . $order->get_downloadable_file_url( $item['id'], $item['variation_id'] ) . '</a></small>' : '';
 
 			// Variation
 			echo 	($item_meta->meta) ? '<br/><small>' . nl2br( $item_meta->display( true, true ) ) . '</small>' : '';

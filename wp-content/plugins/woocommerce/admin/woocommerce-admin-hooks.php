@@ -10,26 +10,27 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 /**
  * Events
  *
  * @see woocommerce_delete_post()
- * @see woocommerce_trash_post()
- * @see woocommerce_untrash_post()
  * @see woocommerce_preview_emails()
  * @see woocommerce_prevent_admin_access()
- * @see woocommerce_check_download_folder_protection()
+ * @see woocomerce_check_download_folder_protection()
  * @see woocommerce_ms_protect_download_rewite_rules()
  */
 add_action('delete_post', 'woocommerce_delete_post');
-add_action('wp_trash_post', 'woocommerce_trash_post');
-add_action('untrash_post', 'woocommerce_untrash_post');
 add_action('admin_init', 'woocommerce_preview_emails');
 add_action('admin_init', 'woocommerce_prevent_admin_access');
-add_action('woocommerce_settings_saved', 'woocommerce_check_download_folder_protection');
+add_action('woocommerce_settings_saved', 'woocomerce_check_download_folder_protection');
 add_filter('mod_rewrite_rules', 'woocommerce_ms_protect_download_rewite_rules');
+
+/**
+ * Filters
+ *
+ * @see woocommerce_allow_img_insertion()
+ */
+add_filter('get_media_item_args', 'woocommerce_allow_img_insertion');
 
 /**
  * File uploads
@@ -55,8 +56,8 @@ add_filter( 'tiny_mce_version', 'woocommerce_refresh_mce' );
  * @see woocommerce_create_term()
  * @see woocommerce_delete_term()
  */
-add_action( "create_term", 'woocommerce_create_term', 5, 3 );
-add_action( "delete_term", 'woocommerce_delete_term', 5 );
+add_action("create_term", 'woocommerce_create_term', 5, 3);
+add_action("delete_term", 'woocommerce_delete_term', 5, 3);
 
 /**
  * Bulk editing
@@ -68,9 +69,3 @@ add_action( "delete_term", 'woocommerce_delete_term', 5 );
 add_action( 'admin_footer', 'woocommerce_bulk_admin_footer', 10 );
 add_action( 'load-edit.php', 'woocommerce_order_bulk_action' );
 add_action( 'admin_notices', 'woocommerce_order_bulk_admin_notices' );
-
-/**
- * Mijireh Gateway
- */
-add_action( 'add_meta_boxes', array( 'WC_Gateway_Mijireh', 'add_page_slurp_meta' ) );
-add_action( 'wp_ajax_page_slurp', array( 'WC_Gateway_Mijireh', 'page_slurp' ) );

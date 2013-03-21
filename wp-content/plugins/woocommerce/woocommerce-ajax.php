@@ -7,45 +7,77 @@
  * @author 		WooThemes
  * @category 	Core
  * @package 	WooCommerce/Functions/AJAX
- * @version     2.0.0
+ * @version     1.6.4
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /** Frontend AJAX events **************************************************/
 
 /**
- * woocommerce_get_refreshed_fragments function.
+ * Process ajax login
  *
  * @access public
  * @return void
  */
-function woocommerce_get_refreshed_fragments() {
-	global $woocommerce;
+function woocommerce_sidebar_login_ajax_process() {
 
-	header( 'Content-Type: application/json; charset=utf-8' );
+	check_ajax_referer( 'woocommerce-sidebar-login-action', 'security' );
 
-	// Get mini cart
-	ob_start();
-	woocommerce_mini_cart();
-	$mini_cart = ob_get_clean();
+	// Get post data
+	$creds = array();
+	$creds['user_login'] 	= esc_attr($_REQUEST['user_login']);
+	$creds['user_password'] = esc_attr($_REQUEST['user_password']);
+	$creds['remember'] 		= 'forever';
+	$redirect_to 			= esc_attr($_REQUEST['redirect_to']);
 
-	// Fragments and mini cart are returned
-	$data = array(
-		'fragments' => apply_filters( 'add_to_cart_fragments', array(
-				'div.widget_shopping_cart_content' => '<div class="widget_shopping_cart_content">' . $mini_cart . '</div>'
-			)
-		),
-		'cart_hash' => md5( json_encode( $woocommerce->cart->get_cart() ) )
-	);
+	// Check for Secure Cookie
+	$secure_cookie = '';
 
-	echo json_encode( $data );
+	// If the user wants ssl but the session is not ssl, force a secure cookie.
+	if ( ! force_ssl_admin() ) {
+		$user_name = sanitize_user( $creds['user_login']  );
+		if ( $user = get_user_by('login',  $user_name ) ) {
+			if ( get_user_option( 'use_ssl', $user->ID ) ) {
+				$secure_cookie = true;
+				force_ssl_admin(true);
+			}
+		}
+	}
+
+	if ( force_ssl_admin() ) $secure_cookie = true;
+	if ( $secure_cookie=='' && force_ssl_login() ) $secure_cookie = false;
+
+	// Login
+	$user = wp_signon( $creds, $secure_cookie );
+
+	// Redirect filter
+	if ( $secure_cookie && strstr($redirect_to, 'wp-admin') ) $redirect_to = str_replace('http:', 'https:', $redirect_to);
+
+	// Result
+	$result = array();
+
+	if ( !is_wp_error($user) ) :
+		$result['success'] = 1;
+		$result['redirect'] = $redirect_to;
+	else :
+		$result['success'] = 0;
+		if ( $user->errors ) {
+			foreach ($user->errors as $error) {
+				$result['error'] = $error[0];
+				break;
+			}
+		} else {
+			$result['error'] = __('Please enter your username and password to login.', 'woocommerce');
+		}
+	endif;
+
+	header('content-type: application/json; charset=utf-8');
+
+	echo $_GET['callback'] . '(' . json_encode( $result ) . ')';
 
 	die();
 }
 
-add_action( 'wp_ajax_nopriv_woocommerce_get_refreshed_fragments', 'woocommerce_get_refreshed_fragments' );
-add_action( 'wp_ajax_woocommerce_get_refreshed_fragments', 'woocommerce_get_refreshed_fragments' );
+add_action('wp_ajax_nopriv_woocommerce_sidebar_login_process', 'woocommerce_sidebar_login_ajax_process');
 
 
 /**
@@ -60,9 +92,9 @@ function woocommerce_ajax_apply_coupon() {
 	check_ajax_referer( 'apply-coupon', 'security' );
 
 	if ( ! empty( $_POST['coupon_code'] ) ) {
-		$woocommerce->cart->add_discount( sanitize_text_field( $_POST['coupon_code'] ) );
+		$woocommerce->cart->add_discount( stripslashes( trim( $_POST['coupon_code'] ) ) );
 	} else {
-		$woocommerce->add_error( WC_Coupon::get_generic_coupon_error( WC_Coupon::E_WC_COUPON_PLEASE_ENTER ) );
+		$woocommerce->add_error( __('Please enter a coupon code.', 'woocommerce') );
 	}
 
 	$woocommerce->show_messages();
@@ -87,8 +119,7 @@ function woocommerce_ajax_update_shipping_method() {
 
 	if ( ! defined('WOOCOMMERCE_CART') ) define( 'WOOCOMMERCE_CART', true );
 
-	if ( isset( $_POST['shipping_method'] ) )
-		$woocommerce->session->chosen_shipping_method = $_POST['shipping_method'];
+	if ( isset( $_POST['shipping_method'] ) ) $_SESSION['_chosen_shipping_method'] = $_POST['shipping_method'];
 
 	$woocommerce->cart->calculate_totals();
 
@@ -112,58 +143,27 @@ function woocommerce_ajax_update_order_review() {
 
 	check_ajax_referer( 'update-order-review', 'security' );
 
-	if ( ! defined( 'WOOCOMMERCE_CHECKOUT' ) )
-		define( 'WOOCOMMERCE_CHECKOUT', true );
+	if (!defined('WOOCOMMERCE_CHECKOUT')) define('WOOCOMMERCE_CHECKOUT', true);
 
-	if ( sizeof( $woocommerce->cart->get_cart() ) == 0 ) {
-		echo '<div class="woocommerce-error">' . __( 'Sorry, your session has expired.', 'woocommerce' ) . ' <a href="' . home_url() . '">' . __( 'Return to homepage &rarr;', 'woocommerce' ) . '</a></div>';
+	if (sizeof($woocommerce->cart->get_cart())==0) :
+		echo '<div class="woocommerce_error">'.__('Sorry, your session has expired.', 'woocommerce').' <a href="'.home_url().'">'.__('Return to homepage &rarr;', 'woocommerce').'</a></div>';
 		die();
-	}
+	endif;
 
-	do_action( 'woocommerce_checkout_update_order_review', $_POST['post_data'] );
+	do_action('woocommerce_checkout_update_order_review', $_POST['post_data']);
 
-	$woocommerce->session->chosen_shipping_method = empty( $_POST['shipping_method'] ) ? '' : $_POST['shipping_method'];
-	$woocommerce->session->chosen_payment_method  = empty( $_POST['payment_method'] ) ? '' : $_POST['payment_method'];
-
-	if ( isset( $_POST['country'] ) )
-		$woocommerce->customer->set_country( $_POST['country'] );
-
-	if ( isset( $_POST['state'] ) )
-		$woocommerce->customer->set_state( $_POST['state'] );
-
-	if ( isset( $_POST['postcode'] ) )
-		$woocommerce->customer->set_postcode( $_POST['postcode'] );
-
-	if ( isset( $_POST['city'] ) )
-		$woocommerce->customer->set_city( $_POST['city'] );
-
-	if ( isset( $_POST['address'] ) )
-		$woocommerce->customer->set_address( $_POST['address'] );
-
-	if ( isset( $_POST['address_2'] ) )
-		$woocommerce->customer->set_address_2( $_POST['address_2'] );
-
-	if ( isset( $_POST['s_country'] ) )
-		$woocommerce->customer->set_shipping_country( $_POST['s_country'] );
-
-	if ( isset( $_POST['s_state'] ) )
-		$woocommerce->customer->set_shipping_state( $_POST['s_state'] );
-
-	if ( isset( $_POST['s_postcode'] ) )
-		$woocommerce->customer->set_shipping_postcode( $_POST['s_postcode'] );
-
-	if ( isset( $_POST['s_city'] ) )
-		$woocommerce->customer->set_shipping_city( $_POST['s_city'] );
-
-	if ( isset( $_POST['s_address'] ) )
-		$woocommerce->customer->set_shipping_address( $_POST['s_address'] );
-
-	if ( isset( $_POST['s_address_2'] ) )
-		$woocommerce->customer->set_shipping_address_2( $_POST['s_address_2'] );
+	if (isset($_POST['shipping_method'])) $_SESSION['_chosen_shipping_method'] = $_POST['shipping_method'];
+	if (isset($_POST['payment_method'])) $_SESSION['_chosen_payment_method'] = $_POST['payment_method'];
+	if (isset($_POST['country'])) $woocommerce->customer->set_country( $_POST['country'] );
+	if (isset($_POST['state'])) $woocommerce->customer->set_state( $_POST['state'] );
+	if (isset($_POST['postcode'])) $woocommerce->customer->set_postcode( $_POST['postcode'] );
+	if (isset($_POST['s_country'])) $woocommerce->customer->set_shipping_country( $_POST['s_country'] );
+	if (isset($_POST['s_state'])) $woocommerce->customer->set_shipping_state( $_POST['s_state'] );
+	if (isset($_POST['s_postcode'])) $woocommerce->customer->set_shipping_postcode( $_POST['s_postcode'] );
 
 	$woocommerce->cart->calculate_totals();
 
-	do_action( 'woocommerce_checkout_order_review' ); // Display review order table
+	do_action('woocommerce_checkout_order_review'); // Display review order table
 
 	die();
 }
@@ -184,37 +184,24 @@ function woocommerce_ajax_add_to_cart() {
 
 	check_ajax_referer( 'add-to-cart', 'security' );
 
-	$product_id = apply_filters('woocommerce_add_to_cart_product_id', absint( $_POST['product_id'] ) );
-	$quantity   = empty( $_POST['quantity'] ) ? 1 : apply_filters( 'woocommerce_stock_amount', $_POST['quantity'] );
+	$product_id = (int) apply_filters('woocommerce_add_to_cart_product_id', $_POST['product_id']);
 
-	$passed_validation = apply_filters('woocommerce_add_to_cart_validation', true, $product_id, $quantity );
+	$passed_validation = apply_filters('woocommerce_add_to_cart_validation', true, $product_id, 1);
 
-	if ( $passed_validation && $woocommerce->cart->add_to_cart( $product_id, $quantity ) ) {
-
-		do_action( 'woocommerce_ajax_added_to_cart', $product_id );
-
-		if ( get_option( 'woocommerce_cart_redirect_after_add' ) == 'yes' ) {
-			woocommerce_add_to_cart_message( $product_id );
-			$woocommerce->set_messages();
-		}
-
-		// Return fragments
-		woocommerce_get_refreshed_fragments();
-
-	} else {
-
-		header( 'Content-Type: application/json; charset=utf-8' );
-
+	if ($passed_validation && $woocommerce->cart->add_to_cart($product_id, 1)) :
+		// Return html fragments
+		$data = apply_filters('add_to_cart_fragments', array());
+		do_action( 'woocommerce_ajax_added_to_cart', $product_id);
+	else :
 		// If there was an error adding to the cart, redirect to the product page to show any errors
 		$data = array(
 			'error' => true,
-			'product_url' => apply_filters('woocommerce_cart_redirect_after_error', get_permalink( $product_id ), $product_id)
+			'product_url' => get_permalink( $product_id )
 		);
-
 		$woocommerce->set_messages();
+	endif;
 
-		echo json_encode( $data );
-	}
+	echo json_encode( $data );
 
 	die();
 }
@@ -257,9 +244,9 @@ function woocommerce_feature_product() {
 
 	if ( ! is_admin() ) die;
 
-	if ( ! current_user_can('edit_products') ) wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce' ) );
+	if ( ! current_user_can('edit_posts') ) wp_die( __('You do not have sufficient permissions to access this page.', 'woocommerce') );
 
-	if ( ! check_admin_referer('woocommerce-feature-product')) wp_die( __( 'You have taken too long. Please go back and retry.', 'woocommerce' ) );
+	if ( ! check_admin_referer('woocommerce-feature-product')) wp_die( __('You have taken too long. Please go back and retry.', 'woocommerce') );
 
 	$post_id = isset( $_GET['product_id'] ) && (int) $_GET['product_id'] ? (int) $_GET['product_id'] : '';
 
@@ -291,8 +278,8 @@ add_action('wp_ajax_woocommerce-feature-product', 'woocommerce_feature_product')
 function woocommerce_mark_order_complete() {
 
 	if ( !is_admin() ) die;
-	if ( !current_user_can('edit_shop_orders') ) wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce' ) );
-	if ( !check_admin_referer('woocommerce-mark-order-complete')) wp_die( __( 'You have taken too long. Please go back and retry.', 'woocommerce' ) );
+	if ( !current_user_can('edit_posts') ) wp_die( __('You do not have sufficient permissions to access this page.', 'woocommerce') );
+	if ( !check_admin_referer('woocommerce-mark-order-complete')) wp_die( __('You have taken too long. Please go back and retry.', 'woocommerce') );
 	$order_id = isset($_GET['order_id']) && (int) $_GET['order_id'] ? (int) $_GET['order_id'] : '';
 	if (!$order_id) die;
 
@@ -314,8 +301,8 @@ add_action('wp_ajax_woocommerce-mark-order-complete', 'woocommerce_mark_order_co
 function woocommerce_mark_order_processing() {
 
 	if ( !is_admin() ) die;
-	if ( !current_user_can('edit_shop_orders') ) wp_die( __( 'You do not have sufficient permissions to access this page.', 'woocommerce' ) );
-	if ( !check_admin_referer('woocommerce-mark-order-processing')) wp_die( __( 'You have taken too long. Please go back and retry.', 'woocommerce' ) );
+	if ( !current_user_can('edit_posts') ) wp_die( __('You do not have sufficient permissions to access this page.', 'woocommerce') );
+	if ( !check_admin_referer('woocommerce-mark-order-processing')) wp_die( __('You have taken too long. Please go back and retry.', 'woocommerce') );
 	$order_id = isset($_GET['order_id']) && (int) $_GET['order_id'] ? (int) $_GET['order_id'] : '';
 	if (!$order_id) die;
 
@@ -337,8 +324,6 @@ add_action('wp_ajax_woocommerce-mark-order-processing', 'woocommerce_mark_order_
 function woocommerce_add_new_attribute() {
 
 	check_ajax_referer( 'add-attribute', 'security' );
-
-	header( 'Content-Type: application/json; charset=utf-8' );
 
 	$taxonomy = esc_attr( $_POST['taxonomy'] );
 	$term = stripslashes( $_POST['term'] );
@@ -406,111 +391,6 @@ function woocommerce_remove_variations() {
 add_action('wp_ajax_woocommerce_remove_variations', 'woocommerce_remove_variations');
 
 
-function woocommerce_save_attributes() {
-	global $woocommerce;
-
-	check_ajax_referer( 'save-attributes', 'security' );
-
-	// Get post data
-	parse_str( $_POST['data'], $data );
-	$post_id = absint( $_POST['post_id'] );
-
-	// Save Attributes
-	$attributes = array();
-
-	if ( isset( $data['attribute_names'] ) ) {
-
-		$attribute_names  = array_map( 'stripslashes', $data['attribute_names'] );
-		$attribute_values = $data['attribute_values'];
-
-		if ( isset( $data['attribute_visibility'] ) )
-			$attribute_visibility = $data['attribute_visibility'];
-
-		if ( isset( $data['attribute_variation'] ) )
-			$attribute_variation = $data['attribute_variation'];
-
-		$attribute_is_taxonomy = $data['attribute_is_taxonomy'];
-		$attribute_position = $data['attribute_position'];
-
-		$attribute_names_count = sizeof( $attribute_names );
-
-		for ( $i=0; $i < $attribute_names_count; $i++ ) {
-			if ( ! $attribute_names[ $i ] )
-				continue;
-
-			$is_visible 	= isset( $attribute_visibility[ $i ] ) ? 1 : 0;
-			$is_variation 	= isset( $attribute_variation[ $i ] ) ? 1 : 0;
-			$is_taxonomy 	= $attribute_is_taxonomy[ $i ] ? 1 : 0;
-
-			if ( $is_taxonomy ) {
-
-				if ( isset( $attribute_values[ $i ] ) ) {
-
-			 		// Format values
-			 		if ( is_array( $attribute_values[ $i ] ) ) {
-				 		$values = array_map( 'woocommerce_clean', array_map( 'stripslashes', $attribute_values[ $i ] ) );
-				 	} else {
-				 		// Text based, separate by pipe
-				 		$values = array_map( 'woocommerce_clean', array_map( 'stripslashes', explode( '|', $attribute_values[ $i ] ) ) );
-				 	}
-
-				 	// Remove empty items in the array
-				 	$values = array_filter( $values );
-
-			 	} else {
-			 		$values = array();
-			 	}
-
-		 		// Update post terms
-		 		if ( taxonomy_exists( $attribute_names[ $i ] ) )
-		 			wp_set_object_terms( $post_id, $values, $attribute_names[ $i ] );
-
-		 		if ( $values ) {
-			 		// Add attribute to array, but don't set values
-			 		$attributes[ sanitize_title( $attribute_names[ $i ] ) ] = array(
-				 		'name' 			=> woocommerce_clean( $attribute_names[ $i ] ),
-				 		'value' 		=> '',
-				 		'position' 		=> $attribute_position[ $i ],
-				 		'is_visible' 	=> $is_visible,
-				 		'is_variation' 	=> $is_variation,
-				 		'is_taxonomy' 	=> $is_taxonomy
-				 	);
-			 	}
-
-		 	} elseif ( isset( $attribute_values[ $i ] ) ) {
-
-		 		// Text based, separate by pipe
-		 		$values = implode( ' | ', array_map( 'woocommerce_clean', array_map( 'stripslashes', explode( '|', $attribute_values[ $i ] ) ) ) );
-
-		 		// Custom attribute - Add attribute to array and set the values
-			 	$attributes[ sanitize_title( $attribute_names[ $i ] ) ] = array(
-			 		'name' 			=> woocommerce_clean( $attribute_names[ $i ] ),
-			 		'value' 		=> $values,
-			 		'position' 		=> $attribute_position[ $i ],
-			 		'is_visible' 	=> $is_visible,
-			 		'is_variation' 	=> $is_variation,
-			 		'is_taxonomy' 	=> $is_taxonomy
-			 	);
-		 	}
-
-		 }
-	}
-
-	if ( ! function_exists( 'attributes_cmp' ) ) {
-		function attributes_cmp( $a, $b ) {
-		    if ( $a['position'] == $b['position'] ) return 0;
-		    return ( $a['position'] < $b['position'] ) ? -1 : 1;
-		}
-	}
-	uasort( $attributes, 'attributes_cmp' );
-
-	update_post_meta( $post_id, '_product_attributes', $attributes );
-
-	die();
-}
-
-add_action('wp_ajax_woocommerce_save_attributes', 'woocommerce_save_attributes');
-
 /**
  * Add variation via ajax function
  *
@@ -518,74 +398,22 @@ add_action('wp_ajax_woocommerce_save_attributes', 'woocommerce_save_attributes')
  * @return void
  */
 function woocommerce_add_variation() {
-	global $woocommerce;
 
 	check_ajax_referer( 'add-variation', 'security' );
 
 	$post_id = intval( $_POST['post_id'] );
-	$loop = intval( $_POST['loop'] );
 
 	$variation = array(
-		'post_title' 	=> 'Product #' . $post_id . ' Variation',
-		'post_content' 	=> '',
-		'post_status' 	=> 'publish',
-		'post_author' 	=> get_current_user_id(),
-		'post_parent' 	=> $post_id,
-		'post_type' 	=> 'product_variation'
+		'post_title' => 'Product #' . $post_id . ' Variation',
+		'post_content' => '',
+		'post_status' => 'publish',
+		'post_author' => get_current_user_id(),
+		'post_parent' => $post_id,
+		'post_type' => 'product_variation'
 	);
-
 	$variation_id = wp_insert_post( $variation );
 
-	do_action( 'woocommerce_create_product_variation', $variation_id );
-
-	if ( $variation_id ) {
-
-		$variation_post_status = 'publish';
-		$variation_data = get_post_meta( $variation_id );
-		$variation_data['variation_post_id'] = $variation_id;
-
-		// Get attributes
-		$attributes = (array) maybe_unserialize( get_post_meta( $post_id, '_product_attributes', true ) );
-
-		// Get tax classes
-		$tax_classes = array_filter(array_map('trim', explode("\n", get_option('woocommerce_tax_classes'))));
-		$tax_class_options = array();
-		$tax_class_options['parent'] =__( 'Same as parent', 'woocommerce' );
-		$tax_class_options[''] = __( 'Standard', 'woocommerce' );
-		if ($tax_classes) foreach ( $tax_classes as $class )
-			$tax_class_options[sanitize_title($class)] = $class;
-
-		// Get parent data
-		$parent_data = array(
-			'id'		=> $post_id,
-			'attributes' => $attributes,
-			'tax_class_options' => $tax_class_options,
-			'sku' 		=> get_post_meta( $post_id, '_sku', true ),
-			'weight' 	=> get_post_meta( $post_id, '_weight', true ),
-			'length' 	=> get_post_meta( $post_id, '_length', true ),
-			'width' 	=> get_post_meta( $post_id, '_width', true ),
-			'height' 	=> get_post_meta( $post_id, '_height', true ),
-			'tax_class' => get_post_meta( $post_id, '_tax_class', true )
-		);
-
-		if ( ! $parent_data['weight'] )
-			$parent_data['weight'] = '0.00';
-
-		if ( ! $parent_data['length'] )
-			$parent_data['length'] = '0';
-
-		if ( ! $parent_data['width'] )
-			$parent_data['width'] = '0';
-
-		if ( ! $parent_data['height'] )
-			$parent_data['height'] = '0';
-
-		$_tax_class = '';
-		$image_id = 0;
-		$variation = get_post( $variation_id ); // Get the variation object
-
-		include( 'admin/post-types/writepanels/variation-admin-html.php' );
-	}
+	echo $variation_id;
 
 	die();
 }
@@ -601,55 +429,51 @@ add_action('wp_ajax_woocommerce_add_variation', 'woocommerce_add_variation');
  */
 function woocommerce_link_all_variations() {
 	global $woocommerce;
-
-	if ( ! defined( 'WC_MAX_LINKED_VARIATIONS' ) ) {
-		define( 'WC_MAX_LINKED_VARIATIONS', 49 );
-	}
-
+	
 	check_ajax_referer( 'link-variations', 'security' );
 
 	@set_time_limit(0);
 
 	$post_id = intval( $_POST['post_id'] );
 
-	if ( ! $post_id ) die();
+	if (!$post_id) die();
 
 	$variations = array();
 
-	$_product = get_product( $post_id, array( 'product_type' => 'variable' ) );
+	$_product = new WC_Product( $post_id );
 
 	// Put variation attributes into an array
-	foreach ( $_product->get_attributes() as $attribute ) {
+	foreach ($_product->get_attributes() as $attribute) :
 
-		if ( ! $attribute['is_variation'] ) continue;
+		if ( !$attribute['is_variation'] ) continue;
 
-		$attribute_field_name = 'attribute_' . sanitize_title( $attribute['name'] );
+		$attribute_field_name = 'attribute_' . sanitize_title($attribute['name']);
 
-		if ( $attribute['is_taxonomy'] ) {
+		if ($attribute['is_taxonomy']) :
 			$post_terms = wp_get_post_terms( $post_id, $attribute['name'] );
 			$options = array();
-			foreach ( $post_terms as $term ) {
+			foreach ($post_terms as $term) :
 				$options[] = $term->slug;
-			}
-		} else {
+			endforeach;
+		else :
 			$options = explode('|', $attribute['value']);
-		}
+		endif;
 
 		$options = array_map('trim', $options);
 
-		$variations[ $attribute_field_name ] = $options;
-	}
+		$variations[$attribute_field_name] = $options;
+
+	endforeach;
 
 	// Quit out if none were found
-	if ( sizeof( $variations ) == 0 ) die();
+	if (sizeof($variations)==0) die();
 
-	// Get existing variations so we don't create duplicates
+	// Get existing variations so we don't create duplicated
     $available_variations = array();
 
-    foreach( $_product->get_children() as $child_id ) {
+    foreach($_product->get_children() as $child_id) {
     	$child = $_product->get_child( $child_id );
-
-        if ( ! empty( $child->variation_id ) ) {
+        if ($child instanceof WC_Product_Variation) {
             $available_variations[] = $child->get_variation_attributes();
         }
     }
@@ -665,20 +489,20 @@ function woocommerce_link_all_variations() {
 	);
 
 	// Now find all combinations and create posts
-	if ( ! function_exists( 'array_cartesian' ) ) {
-		function array_cartesian( $input ) {
+	if (!function_exists('array_cartesian')) {
+		function array_cartesian($input) {
 		    $result = array();
 
-		    while ( list( $key, $values ) = each( $input ) ) {
+		    while (list($key, $values) = each($input)) {
 		        // If a sub-array is empty, it doesn't affect the cartesian product
-		        if ( empty( $values ) ) {
+		        if (empty($values)) {
 		            continue;
 		        }
 
 		        // Special case: seeding the product array with the values from the first sub-array
-		        if ( empty( $result ) ) {
-		            foreach ( $values as $value ) {
-		                $result[] = array( $key => $value );
+		        if (empty($result)) {
+		            foreach($values as $value) {
+		                $result[] = array($key => $value);
 		            }
 		        }
 		        else {
@@ -692,28 +516,28 @@ function woocommerce_link_all_variations() {
 		            // Store all items to be added to $product here; adding them on the spot
 		            // inside the foreach will result in an infinite loop
 		            $append = array();
-		            foreach( $result as &$product ) {
+		            foreach($result as &$product) {
 		                // Do step 1 above. array_shift is not the most efficient, but it
 		                // allows us to iterate over the rest of the items with a simple
 		                // foreach, making the code short and familiar.
-		                $product[ $key ] = array_shift( $values );
+		                $product[$key] = array_shift($values);
 
 		                // $product is by reference (that's why the key we added above
 		                // will appear in the end result), so make a copy of it here
 		                $copy = $product;
 
 		                // Do step 2 above.
-		                foreach( $values as $item ) {
-		                    $copy[ $key ] = $item;
+		                foreach($values as $item) {
+		                    $copy[$key] = $item;
 		                    $append[] = $copy;
 		                }
 
 		                // Undo the side effecst of array_shift
-		                array_unshift( $values, $product[ $key ] );
+		                array_unshift($values, $product[$key]);
 		            }
 
 		            // Out of the foreach, we can add to $results now
-		            $result = array_merge( $result, $append );
+		            $result = array_merge($result, $append);
 		        }
 		    }
 
@@ -725,27 +549,28 @@ function woocommerce_link_all_variations() {
 	$added = 0;
 	$possible_variations = array_cartesian( $variations );
 
-	foreach ( $possible_variations as $variation ) {
+	foreach ($possible_variations as $variation) :
 
 		// Check if variation already exists
-		if ( in_array( $variation, $available_variations ) ) continue;
+		if (in_array($variation, $available_variations)) continue;
 
 		$variation_id = wp_insert_post( $variation_post_data );
 
 		$variation_ids[] = $variation_id;
 
-		foreach ( $variation as $key => $value ) {
+		foreach ($variation as $key => $value) :
+
 			update_post_meta( $variation_id, $key, $value );
-		}
+
+		endforeach;
 
 		$added++;
 
-		do_action( 'product_variation_linked', $variation_id );
+		// Max 100
+		if ($added>49) break;
 
-		if ( $added > WC_MAX_LINKED_VARIATIONS ) break;
-
-	}
-
+	endforeach;
+	
 	$woocommerce->clear_product_transients( $post_id );
 
 	echo $added;
@@ -768,11 +593,14 @@ function woocommerce_revoke_access_to_download() {
 
 	global $wpdb;
 
-	$download_id = $_POST['download_id'];
 	$product_id = intval( $_POST['product_id'] );
 	$order_id 	= intval( $_POST['order_id'] );
 
-	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}woocommerce_downloadable_product_permissions WHERE order_id = %d AND product_id = %d AND download_id = %d;", $order_id, $product_id, $download_id ) );
+	$wpdb->query("
+		DELETE FROM {$wpdb->prefix}woocommerce_downloadable_product_permissions
+		WHERE order_id = $order_id
+		AND product_id = $product_id
+	");
 
 	die();
 }
@@ -792,89 +620,66 @@ function woocommerce_grant_access_to_download() {
 
 	global $wpdb;
 
-	$order_id 	= intval( $_POST['order_id'] );
 	$product_id = intval( $_POST['product_id'] );
-	$loop 		= intval( $_POST['loop'] );
-	$file_count = 0;
+	$order_id 	= intval( $_POST['order_id'] );
 
-	$order 		= new WC_Order( $order_id );
-	$product 	= get_product( $product_id );
+	$order = new WC_Order( $order_id );
 
-	$user_email = sanitize_email( $order->billing_email );
+	$user_email = $order->billing_email;
 
-	if ( ! $user_email )
-		die();
+	$limit = trim(get_post_meta($product_id, '_download_limit', true));
+	$expiry = trim(get_post_meta($product_id, '_download_expiry', true));
 
-	$limit		= trim( get_post_meta( $product_id, '_download_limit', true ) );
-	$expiry 	= trim( get_post_meta( $product_id, '_download_expiry', true ) );
-	$file_paths = apply_filters( 'woocommerce_file_download_paths', get_post_meta( $product_id, '_file_paths', true ), $product_id, $order_id, null );
-
-    $limit 		= empty( $limit ) ? '' : (int) $limit;
+    $limit = (empty($limit)) ? '' : (int) $limit;
 
     // Default value is NULL in the table schema
-	$expiry 	= empty( $expiry ) ? null : (int) $expiry;
+	$expiry = (empty($expiry)) ? null : (int) $expiry;
 
-	if ( $expiry )
-		$expiry = date_i18n( "Y-m-d", strtotime( 'NOW + ' . $expiry . ' DAY' ) );
+	if ($expiry) $expiry = date_i18n( "Y-m-d", strtotime( 'NOW + ' . $expiry . ' DAY' ) );
 
 	$wpdb->hide_errors();
 
-	$response = array();
-	if ( $file_paths ) {
-		foreach ( $file_paths as $download_id => $file_path ) {
+    $data = array(
+        'product_id' 			=> $product_id,
+        'user_id' 				=> (int) $order->user_id,
+        'user_email' 			=> $user_email,
+        'order_id' 				=> $order->id,
+        'order_key' 			=> $order->order_key,
+        'downloads_remaining' 	=> $limit,
+        'access_granted'		=> current_time('mysql'),
+        'download_count'		=> 0
+    );
 
-		    $data = array(
-		    	'download_id'			=> $download_id,
-		        'product_id' 			=> $product_id,
-		        'user_id' 				=> (int) $order->user_id,
-		        'user_email' 			=> $user_email,
-		        'order_id' 				=> $order->id,
-		        'order_key' 			=> $order->order_key,
-		        'downloads_remaining' 	=> $limit,
-		        'access_granted'		=> current_time( 'mysql' ),
-		        'download_count'		=> 0
-		    );
+    $format = array(
+        '%s',
+        '%s',
+        '%s',
+        '%s',
+        '%s',
+        '%s',
+        '%s',
+        '%d'
+    );
 
-		    $format = array(
-		    	'%s',
-		        '%s',
-		        '%s',
-		        '%s',
-		        '%s',
-		        '%s',
-		        '%s',
-		        '%s',
-		        '%d'
-		    );
+    if ( ! is_null($expiry)) {
+        $data['access_expires'] = $expiry;
+        $format[] = '%s';
+    }
 
-		    if ( ! is_null( $expiry ) ) {
-		        $data['access_expires'] = $expiry;
-		        $format[] = '%s';
-		    }
+    // Downloadable product - give access to the customer
+    $success = $wpdb->insert( $wpdb->prefix . 'woocommerce_downloadable_product_permissions',
+        $data,
+        $format
+    );
 
-		    // Downloadable product - give access to the customer
-		    $success = $wpdb->insert( $wpdb->prefix . 'woocommerce_downloadable_product_permissions',
-		        $data,
-		        $format
-		    );
-
-			if ( $success ) {
-
-				$download = new stdClass();
-				$download->product_id 	= $product_id;
-				$download->download_id 	= $download_id;
-				$download->order_id 	= $order->id;
-				$download->order_key	= $order->order_key;
-				$download->download_count 		= 0;
-				$download->downloads_remaining 	= $limit;
-				$download->access_expires 		= $expiry;
-
-				$loop++;
-				$file_count++;
-
-				include( 'admin/post-types/writepanels/order-download-permission-html.php' );
-			}
-		}
+	if ($success) {
+		echo json_encode(array(
+			'success'		=> 1,
+			'download_id'  	=> $product_id,
+			'title'			=> get_the_title($product_id),
+			'expires'		=> is_null($expiry) ? '' : $expiry,
+			'remaining'		=> $limit
+		));
 	}
 
 	die();
@@ -895,8 +700,6 @@ function woocommerce_get_customer_details() {
 
 	check_ajax_referer( 'get-customer-details', 'security' );
 
-	header( 'Content-Type: application/json; charset=utf-8' );
-
 	$user_id = (int) trim(stripslashes($_POST['user_id']));
 	$type_to_load = esc_attr(trim(stripslashes($_POST['type_to_load'])));
 
@@ -914,9 +717,7 @@ function woocommerce_get_customer_details() {
 		$type_to_load . '_phone' => get_user_meta( $user_id, $type_to_load . '_phone', true ),
 	);
 
-	$customer_data = apply_filters( 'woocommerce_found_customer_details', $customer_data );
-
-	echo json_encode( $customer_data );
+	echo json_encode($customer_data);
 
 	// Quit out
 	die();
@@ -931,278 +732,118 @@ add_action('wp_ajax_woocommerce_get_customer_details', 'woocommerce_get_customer
  * @access public
  * @return void
  */
-function woocommerce_ajax_add_order_item() {
+function woocommerce_add_order_item() {
 	global $woocommerce, $wpdb;
 
-	check_ajax_referer( 'order-item', 'security' );
+	check_ajax_referer( 'add-order-item', 'security' );
 
-	$item_to_add = sanitize_text_field( $_POST['item_to_add'] );
-	$order_id = absint( $_POST['order_id'] );
+	$index = trim(stripslashes($_POST['index']));
+	$item_to_add = trim(stripslashes($_POST['item_to_add']));
+
+	$post = '';
 
 	// Find the item
-	if ( ! is_numeric( $item_to_add ) )
+	if (is_numeric($item_to_add)) :
+		$post = get_post( $item_to_add );
+	endif;
+
+	if (!$post || ($post->post_type!=='product' && $post->post_type!=='product_variation')) :
+		$post_id = $wpdb->get_var($wpdb->prepare("
+			SELECT post_id
+			FROM $wpdb->posts
+			LEFT JOIN $wpdb->postmeta ON ($wpdb->posts.ID = $wpdb->postmeta.post_id)
+			WHERE $wpdb->postmeta.meta_key = '_sku'
+			AND $wpdb->posts.post_status = 'publish'
+			AND $wpdb->posts.post_type = 'shop_product'
+			AND $wpdb->postmeta.meta_value = %s
+			LIMIT 1
+		"), $item_to_add );
+		$post = get_post( $post_id );
+	endif;
+
+	if (!$post || ($post->post_type!=='product' && $post->post_type!=='product_variation')) :
 		die();
+	endif;
 
-	$post = get_post( $item_to_add );
+	if ($post->post_type=="product") :
+		$_product = new WC_Product( $post->ID );
+	else :
+		$_product = new WC_Product_Variation( $post->ID );
+	endif;
+	?>
+	<tr class="item" rel="<?php echo $index; ?>">
+		<td class="thumb">
+			<a href="<?php echo esc_url( admin_url('post.php?post='. $_product->id .'&action=edit') ); ?>" class="tips" data-tip="<?php
+				echo '<strong>'.__('Product ID:', 'woocommerce').'</strong> '. $_product->id;
+				echo '<br/><strong>'.__('Variation ID:', 'woocommerce').'</strong> '; if (isset($_product->variation_id) && $_product->variation_id) echo $_product->variation_id; else echo '-';
+				echo '<br/><strong>'.__('Product SKU:', 'woocommerce').'</strong> '; if ($_product->sku) echo $_product->sku; else echo '-';
+			?>"><?php echo $_product->get_image(); ?></a>
+		</td>
+		<td class="sku" width="1%">
+			<?php if ($_product->sku) echo $_product->sku; else echo '-'; ?>
+			<input type="hidden" class="item_id" name="item_id[<?php echo $index; ?>]" value="<?php echo esc_attr( $_product->id ); ?>" />
+			<input type="hidden" name="item_name[<?php echo $index; ?>]" value="<?php echo esc_attr( $_product->get_title() ); ?>" />
+			<input type="hidden" name="item_variation[<?php echo $index; ?>]" value="<?php if (isset($_product->variation_id)) echo $_product->variation_id; ?>" />
+		</td>
+		<td class="name">
 
-	if ( ! $post || ( $post->post_type !== 'product' && $post->post_type !== 'product_variation' ) )
-		die();
+			<div class="row-actions">
+				<span class="trash"><a class="remove_row" href="#"><?php _e('Delete item', 'woocommerce'); ?></a> | </span>
+				<span class="view"><a href="<?php echo esc_url( admin_url('post.php?post='. $_product->id .'&action=edit') ); ?>"><?php _e('View product', 'woocommerce'); ?></a>
+			</div>
 
-	$_product = get_product( $post->ID );
+			<?php echo $_product->get_title(); ?>
+			<?php if (isset($_product->variation_data)) echo '<br/>' . woocommerce_get_formatted_variation( $_product->variation_data, true ); ?>
+			<table class="meta" cellspacing="0">
+				<tfoot>
+					<tr>
+						<td colspan="3"><button class="add_meta button"><?php _e('Add&nbsp;meta', 'woocommerce'); ?></button></td>
+					</tr>
+				</tfoot>
+				<tbody class="meta_items"></tbody>
+			</table>
+		</td>
 
-	$order = new WC_Order( $order_id );
-	$class = 'new_row';
+		<?php do_action('woocommerce_admin_order_item_values', $_product); ?>
 
-	// Set values
-	$item = array();
+		<td class="tax_class" width="1%">
+			<select class="tax_class" name="item_tax_class[<?php echo $loop; ?>]">
+				<?php
+				$tax_classes = array_filter(array_map('trim', explode("\n", get_option('woocommerce_tax_classes'))));
+				$classes_options = array();
+				$classes_options[''] = __('Standard', 'woocommerce');
+				if ($tax_classes) foreach ($tax_classes as $class) :
+					$classes_options[sanitize_title($class)] = $class;
+				endforeach;
+				foreach ($classes_options as $value => $name) echo '<option value="'. $value .'" '.selected( $value, $_product->get_tax_status(), false ).'>'. $name .'</option>';
+				?>
+			</select>
+		</td>
 
-	$item['product_id'] 			= $_product->id;
-	$item['variation_id'] 			= isset( $_product->variation_id ) ? $_product->variation_id : '';
-	$item['name'] 					= $_product->get_title();
-	$item['tax_class']				= $_product->get_tax_class();
-	$item['qty'] 					= 1;
-	$item['line_subtotal'] 			= number_format( (double) $_product->get_price_excluding_tax(), 2, '.', '' );
-	$item['line_subtotal_tax'] 		= '';
-	$item['line_total'] 			= number_format( (double) $_product->get_price_excluding_tax(), 2, '.', '' );
-	$item['line_tax'] 				= '';
+		<td class="quantity" width="1%">
+			<input type="text" name="item_quantity[<?php echo $index; ?>]" placeholder="0" value="1" size="2" class="quantity" />
+		</td>
 
-	// Add line item
-   	$item_id = woocommerce_add_order_item( $order_id, array(
- 		'order_item_name' 		=> $item['name'],
- 		'order_item_type' 		=> 'line_item'
- 	) );
+		<td class="line_subtotal" width="1%">
+			<label><?php _e('Cost', 'woocommerce'); ?>: <input type="text" name="line_subtotal[<?php echo $index; ?>]" placeholder="0.00" value="<?php echo esc_attr( number_format( (double) $_product->get_price_excluding_tax(), 2, '.', '' ) ); ?>" class="line_subtotal" /></label>
 
- 	// Add line item meta
- 	if ( $item_id ) {
-	 	woocommerce_add_order_item_meta( $item_id, '_qty', $item['qty'] );
-	 	woocommerce_add_order_item_meta( $item_id, '_tax_class', $item['tax_class'] );
-	 	woocommerce_add_order_item_meta( $item_id, '_product_id', $item['product_id'] );
-	 	woocommerce_add_order_item_meta( $item_id, '_variation_id', $item['variation_id'] );
-	 	woocommerce_add_order_item_meta( $item_id, '_line_subtotal', $item['line_subtotal'] );
-	 	woocommerce_add_order_item_meta( $item_id, '_line_subtotal_tax', $item['line_subtotal_tax'] );
-	 	woocommerce_add_order_item_meta( $item_id, '_line_total', $item['line_total'] );
-	 	woocommerce_add_order_item_meta( $item_id, '_line_tax', $item['line_tax'] );
- 	}
+			<label><?php _e('Tax', 'woocommerce'); ?>: <input type="text" name="line_subtotal_tax[<?php echo $index; ?>]" placeholder="0.00" class="line_subtotal_tax" /></label>
+		</td>
 
-	include( 'admin/post-types/writepanels/order-item-html.php' );
+		<td class="line_total" width="1%">
+			<label><?php _e('Cost', 'woocommerce'); ?>: <input type="text" name="line_total[<?php echo $index; ?>]" placeholder="0.00" value="<?php echo esc_attr( number_format( (double) $_product->get_price_excluding_tax(), 2, '.', '' ) ); ?>" class="line_total" /></label>
+
+			<label><?php _e('Tax', 'woocommerce'); ?>: <input type="text" name="line_tax[<?php echo $index; ?>]" placeholder="0.00" class="line_tax" /></label>
+		</td>
+
+	</tr>
+	<?php
 
 	// Quit out
 	die();
 }
 
-add_action('wp_ajax_woocommerce_add_order_item', 'woocommerce_ajax_add_order_item');
-
-
-/**
- * Add order fee via ajax
- *
- * @access public
- * @return void
- */
-function woocommerce_ajax_add_order_fee() {
-	global $woocommerce;
-
-	check_ajax_referer( 'order-item', 'security' );
-
-	$order_id 	= absint( $_POST['order_id'] );
-	$order 		= new WC_Order( $order_id );
-
-	// Add line item
-   	$item_id = woocommerce_add_order_item( $order_id, array(
- 		'order_item_name' 		=> '',
- 		'order_item_type' 		=> 'fee'
- 	) );
-
- 	// Add line item meta
- 	if ( $item_id ) {
-	 	woocommerce_add_order_item_meta( $item_id, '_tax_class', '' );
-	 	woocommerce_add_order_item_meta( $item_id, '_line_total', '' );
-	 	woocommerce_add_order_item_meta( $item_id, '_line_tax', '' );
- 	}
-
-	include( 'admin/post-types/writepanels/order-fee-html.php' );
-
-	// Quit out
-	die();
-}
-
-add_action('wp_ajax_woocommerce_add_order_fee', 'woocommerce_ajax_add_order_fee');
-
-
-/**
- * woocommerce_ajax_remove_order_item function.
- *
- * @access public
- * @return void
- */
-function woocommerce_ajax_remove_order_item() {
-	global $woocommerce, $wpdb;
-
-	check_ajax_referer( 'order-item', 'security' );
-
-	$order_item_ids = $_POST['order_item_ids'];
-
-	if ( sizeof( $order_item_ids ) > 0 ) {
-		foreach( $order_item_ids as $id ) {
-			woocommerce_delete_order_item( absint( $id ) );
-		}
-	}
-
-	die();
-}
-
-add_action( 'wp_ajax_woocommerce_remove_order_item', 'woocommerce_ajax_remove_order_item' );
-
-
-/**
- * woocommerce_ajax_reduce_order_item_stock function.
- *
- * @access public
- * @return void
- */
-function woocommerce_ajax_reduce_order_item_stock() {
-	global $woocommerce, $wpdb;
-
-	check_ajax_referer( 'order-item', 'security' );
-
-	$order_id		= absint( $_POST['order_id'] );
-	$order_item_ids	= isset( $_POST['order_item_ids'] ) ? $_POST['order_item_ids'] : array();
-	$order_item_qty	= isset( $_POST['order_item_qty'] ) ? $_POST['order_item_qty'] : array();
-	$order 			= new WC_Order( $order_id );
-	$order_items 	= $order->get_items();
-	$return 		= array();
-
-	if ( $order && ! empty( $order_items ) && sizeof( $order_item_ids ) > 0 ) {
-
-		foreach ( $order_items as $item_id => $order_item ) {
-
-			// Only reduce checked items
-			if ( ! in_array( $item_id, $order_item_ids ) )
-				continue;
-
-			$_product = $order->get_product_from_item( $order_item );
-
-			if ( $_product->exists() && $_product->managing_stock() && isset( $order_item_qty[ $item_id ] ) && $order_item_qty[ $item_id ] > 0 ) {
-
-				$old_stock 		= $_product->stock;
-				$stock_change   = apply_filters( 'woocommerce_reduce_order_stock_quantity', $order_item_qty[ $item_id ], $item_id );
-				$new_quantity 	= $_product->reduce_stock( $stock_change );
-
-				$return[] = sprintf( __( 'Item #%s stock reduced from %s to %s.', 'woocommerce' ), $order_item['product_id'], $old_stock, $new_quantity );
-				$order->add_order_note( sprintf( __( 'Item #%s stock reduced from %s to %s.', 'woocommerce' ), $order_item['product_id'], $old_stock, $new_quantity) );
-				$order->send_stock_notifications( $_product, $new_quantity, $order_item_qty[ $item_id ] );
-			}
-		}
-
-		do_action( 'woocommerce_reduce_order_stock', $order );
-
-		if ( empty( $return ) )
-			$return[] = __( 'No products had their stock reduced - they may not have stock management enabled.', 'woocommerce' );
-
-		echo implode( ', ', $return );
-	}
-
-	die();
-}
-
-add_action( 'wp_ajax_woocommerce_reduce_order_item_stock', 'woocommerce_ajax_reduce_order_item_stock' );
-
-/**
- * woocommerce_ajax_increase_order_item_stock function.
- *
- * @access public
- * @return void
- */
-function woocommerce_ajax_increase_order_item_stock() {
-	global $woocommerce, $wpdb;
-
-	check_ajax_referer( 'order-item', 'security' );
-
-	$order_id		= absint( $_POST['order_id'] );
-	$order_item_ids	= isset( $_POST['order_item_ids'] ) ? $_POST['order_item_ids'] : array();
-	$order_item_qty	= isset( $_POST['order_item_qty'] ) ? $_POST['order_item_qty'] : array();
-	$order 			= new WC_Order( $order_id );
-	$order_items 	= $order->get_items();
-	$return 		= array();
-
-	if ( $order && ! empty( $order_items ) && sizeof( $order_item_ids ) > 0 ) {
-
-		foreach ( $order_items as $item_id => $order_item ) {
-
-			// Only reduce checked items
-			if ( ! in_array( $item_id, $order_item_ids ) )
-				continue;
-
-			$_product = $order->get_product_from_item( $order_item );
-
-			if ( $_product->exists() && $_product->managing_stock() && isset( $order_item_qty[ $item_id ] ) && $order_item_qty[ $item_id ] > 0 ) {
-
-				$old_stock 		= $_product->stock;
-				$stock_change   = apply_filters( 'woocommerce_restore_order_stock_quantity', $order_item_qty[ $item_id ], $item_id );
-				$new_quantity 	= $_product->increase_stock( $stock_change );
-
-				$return[] = sprintf( __( 'Item #%s stock increased from %s to %s.', 'woocommerce' ), $order_item['product_id'], $old_stock, $new_quantity );
-				$order->add_order_note( sprintf( __( 'Item #%s stock increased from %s to %s.', 'woocommerce' ), $order_item['product_id'], $old_stock, $new_quantity ) );
-			}
-		}
-
-		do_action( 'woocommerce_restore_order_stock', $order );
-
-		if ( empty( $return ) )
-			$return[] = __( 'No products had their stock increased - they may not have stock management enabled.', 'woocommerce' );
-
-		echo implode( ', ', $return );
-	}
-
-	die();
-}
-
-add_action( 'wp_ajax_woocommerce_increase_order_item_stock', 'woocommerce_ajax_increase_order_item_stock' );
-
-/**
- * woocommerce_ajax_add_order_item_meta function.
- *
- * @access public
- * @return void
- */
-function woocommerce_ajax_add_order_item_meta() {
-	global $woocommerce, $wpdb;
-
-	check_ajax_referer( 'order-item', 'security' );
-
-	$meta_id = woocommerce_add_order_item_meta( absint( $_POST['order_item_id'] ), __( 'Name', 'woocommerce' ), __( 'Value', 'woocommerce' ) );
-
-	if ( $meta_id ) {
-
-		echo '<tr data-meta_id="' . $meta_id . '"><td><input type="text" name="meta_key[' . $meta_id . ']" value="" /></td><td><input type="text" name="meta_value[' . $meta_id . ']" value="" /></td><td width="1%"><button class="remove_order_item_meta button">&times;</button></td></tr>';
-
-	}
-
-	die();
-}
-
-add_action( 'wp_ajax_woocommerce_add_order_item_meta', 'woocommerce_ajax_add_order_item_meta' );
-
-
-/**
- * woocommerce_ajax_remove_order_item_meta function.
- *
- * @access public
- * @return void
- */
-function woocommerce_ajax_remove_order_item_meta() {
-	global $woocommerce, $wpdb;
-
-	check_ajax_referer( 'order-item', 'security' );
-
-	$meta_id = absint( $_POST['meta_id'] );
-
-	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}woocommerce_order_itemmeta WHERE meta_id = %d", $meta_id ) );
-
-	die();
-}
-
-add_action( 'wp_ajax_woocommerce_remove_order_item_meta', 'woocommerce_ajax_remove_order_item_meta' );
+add_action('wp_ajax_woocommerce_add_order_item', 'woocommerce_add_order_item');
 
 
 /**
@@ -1212,170 +853,46 @@ add_action( 'wp_ajax_woocommerce_remove_order_item_meta', 'woocommerce_ajax_remo
  * @return void
  */
 function woocommerce_calc_line_taxes() {
-	global $woocommerce, $wpdb;
+	global $woocommerce;
 
 	check_ajax_referer( 'calc-totals', 'security' );
 
-	header( 'Content-Type: application/json; charset=utf-8' );
-
 	$tax = new WC_Tax();
 
-	$taxes = $tax_rows = $item_taxes = $shipping_taxes = array();
+	$base_tax_amount = 0;
+	$line_tax_amount = 0;
 
-	$order_id 		= absint( $_POST['order_id'] );
 	$country 		= strtoupper( esc_attr( $_POST['country'] ) );
 	$state 			= strtoupper( esc_attr( $_POST['state'] ) );
 	$postcode 		= strtoupper( esc_attr( $_POST['postcode'] ) );
-	$city 			= sanitize_title( esc_attr( $_POST['city'] ) );
 
-	$items			= $_POST['items'];
-	$shipping		= $_POST['shipping'];
-	$item_tax		= 0;
+	$line_subtotal 	= esc_attr( $_POST['line_subtotal'] );
+	$line_total 	= esc_attr( $_POST['line_total'] );
 
-	// Calculate sales tax first
-	if ( sizeof( $items ) > 0 ) {
-		foreach( $items as $item_id => $item ) {
+	$item_id		= esc_attr( $_POST['item_id'] );
+	$tax_class 		= esc_attr( $_POST['tax_class'] );
 
-			$item_id		= absint( $item_id );
-			$line_subtotal 	= isset( $item['line_subtotal']  ) ? esc_attr( $item['line_subtotal'] ) : '';
-			$line_total		= esc_attr( $item['line_total'] );
-			$tax_class 		= esc_attr( $item['tax_class'] );
+	if ( ! $item_id ) return;
 
-			if ( ! $item_id || $tax_class == '0' )
-				continue;
+	// Get product details
+	$_product			= new WC_Product( $item_id );
+	$item_tax_status 	= $_product->get_tax_status();
 
-			// Get product details
-			if ( get_post_type( $item_id ) == 'product' ) {
-				$_product			= get_product( $item_id );
-				$item_tax_status 	= $_product->get_tax_status();
-			} else {
-				$item_tax_status 	= 'taxable';
-			}
+	if ( $item_tax_status == 'taxable' ) {
 
-			// Only calc if taxable
-			if ( $item_tax_status == 'taxable' ) {
+		$tax_rates			= $tax->find_rates( $country, $state, $postcode, $tax_class );
 
-				$tax_rates = $tax->find_rates( array(
-					'country' 	=> $country,
-					'state' 	=> $state,
-					'postcode' 	=> $postcode,
-					'city'		=> $city,
-					'tax_class' => $tax_class
-				) );
+		$line_subtotal_tax_amount	= rtrim( rtrim( number_format( array_sum( $tax->calc_tax( $line_subtotal, $tax_rates, false ) ), 4, '.', '' ), '0' ), '.' );
+		$line_tax_amount			= rtrim( rtrim( number_format( array_sum( $tax->calc_tax( $line_total, $tax_rates, false ) ), 4, '.', '' ), '0' ), '.' );
 
-				$line_subtotal_taxes = $tax->calc_tax( $line_subtotal, $tax_rates, false );
-				$line_taxes = $tax->calc_tax( $line_total, $tax_rates, false );
-
-				$line_subtotal_tax = $tax->round( array_sum( $line_subtotal_taxes ) );
-				$line_tax = $tax->round( array_sum( $line_taxes ) );
-
-				//$line_subtotal_tax = rtrim( rtrim( number_format( array_sum( $line_subtotal_taxes ), 4, '.', '' ), '0' ), '.' );
-				//$line_tax = rtrim( rtrim( number_format( array_sum( $line_taxes ), 4, '.', '' ), '0' ), '.' );
-
-				if ( $line_subtotal_tax < 0 )
-					$line_subtotal_tax = 0;
-
-				if ( $line_tax < 0 )
-					$line_tax = 0;
-
-				$item_taxes[ $item_id ] = array(
-					'line_subtotal_tax' => $line_subtotal_tax,
-					'line_tax' 			=> $line_tax
-				);
-
-				$item_tax += $line_tax;
-
-				// Sum the item taxes
-				foreach ( array_keys( $taxes + $line_taxes ) as $key )
-					$taxes[ $key ] = ( isset( $line_taxes[ $key ] ) ? $line_taxes[ $key ] : 0 ) + ( isset( $taxes[ $key ] ) ? $taxes[ $key ] : 0 );
-			}
-
-		}
 	}
 
-	// Now calculate shipping tax
-	$matched_tax_rates = array();
+	if ( $line_subtotal_tax_amount < 0 ) $line_subtotal_tax_amount = 0;
+	if ( $line_tax_amount < 0 ) $line_tax_amount = 0;
 
-	$tax_rates = $tax->find_rates( array(
-		'country' 	=> $country,
-		'state' 	=> $state,
-		'postcode' 	=> $postcode,
-		'city'		=> $city,
-		'tax_class' => ''
-	) );
-
-	if ( $tax_rates )
-		foreach ( $tax_rates as $key => $rate )
-			if ( isset( $rate['shipping'] ) && $rate['shipping'] == 'yes' )
-				$matched_tax_rates[ $key ] = $rate;
-
-	$shipping_taxes = $tax->calc_shipping_tax( $shipping, $matched_tax_rates );
-	//$shipping_tax = rtrim( rtrim( number_format( array_sum( $shipping_taxes ), 2, '.', '' ), '0' ), '.' );
-	$shipping_tax = $tax->round( array_sum( $shipping_taxes ) );
-
-	// Remove old tax rows
-	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}woocommerce_order_itemmeta WHERE order_item_id IN ( SELECT order_item_id FROM {$wpdb->prefix}woocommerce_order_items WHERE order_id = %d AND order_item_type = 'tax' )", $order_id ) );
-
-	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}woocommerce_order_items WHERE order_id = %d AND order_item_type = 'tax'", $order_id ) );
-
- 	// Get tax rates
-	$rates = $wpdb->get_results( "SELECT tax_rate_id, tax_rate_country, tax_rate_state, tax_rate_name, tax_rate_priority FROM {$wpdb->prefix}woocommerce_tax_rates ORDER BY tax_rate_name" );
-
-	$tax_codes = array();
-
-	foreach( $rates as $rate ) {
-		$code = array();
-
-		$code[] = $rate->tax_rate_country;
-		$code[] = $rate->tax_rate_state;
-		$code[] = $rate->tax_rate_name ? sanitize_title( $rate->tax_rate_name ) : 'TAX';
-		$code[] = absint( $rate->tax_rate_priority );
-
-		$tax_codes[ $rate->tax_rate_id ] = strtoupper( implode( '-', array_filter( $code ) ) );
-	}
-
-	// Now merge to keep tax rows
-	ob_start();
-
-	foreach ( array_keys( $taxes + $shipping_taxes ) as $key ) {
-
-	 	$item 							= array();
-	 	$item['rate_id']			 	= $key;
-		$item['name'] 					= $tax_codes[ $key ];
-		$item['label'] 					= $tax->get_rate_label( $key );
-		$item['compound'] 				= $tax->is_compound( $key ) ? 1 : 0;
-		$item['tax_amount'] 			= $tax->round( isset( $taxes[ $key ] ) ? $taxes[ $key ] : 0 );
-		$item['shipping_tax_amount'] 	= $tax->round( isset( $shipping_taxes[ $key ] ) ? $shipping_taxes[ $key ] : 0 );
-
-		if ( ! $item['label'] )
-			$item['label'] = $woocommerce->countries->tax_or_vat();
-
-		// Add line item
-	   	$item_id = woocommerce_add_order_item( $order_id, array(
-	 		'order_item_name' 		=> $item['name'],
-	 		'order_item_type' 		=> 'tax'
-	 	) );
-
-	 	// Add line item meta
-	 	if ( $item_id ) {
-	 		woocommerce_add_order_item_meta( $item_id, 'rate_id', $item['rate_id'] );
-	 		woocommerce_add_order_item_meta( $item_id, 'label', $item['label'] );
-		 	woocommerce_add_order_item_meta( $item_id, 'compound', $item['compound'] );
-		 	woocommerce_add_order_item_meta( $item_id, 'tax_amount', $item['tax_amount'] );
-		 	woocommerce_add_order_item_meta( $item_id, 'shipping_tax_amount', $item['shipping_tax_amount'] );
-	 	}
-
-		include( 'admin/post-types/writepanels/order-tax-html.php' );
-	}
-
-	$tax_row_html = ob_get_clean();
-
-	// Return
 	echo json_encode( array(
-		'item_tax' 		=> $item_tax,
-		'item_taxes' 	=> $item_taxes,
-		'shipping_tax' 	=> $shipping_tax,
-		'tax_row_html' 	=> $tax_row_html
+		'line_subtotal_tax' => $line_subtotal_tax_amount,
+		'line_tax' => $line_tax_amount
 	) );
 
 	// Quit out
@@ -1384,79 +901,6 @@ function woocommerce_calc_line_taxes() {
 
 add_action('wp_ajax_woocommerce_calc_line_taxes', 'woocommerce_calc_line_taxes');
 
-/**
- * woocommerce_add_line_tax function.
- *
- * @access public
- * @return void
- */
-function woocommerce_add_line_tax() {
-	global $woocommerce, $wpdb;
-
-	check_ajax_referer( 'calc-totals', 'security' );
-
-	$order_id 	= absint( $_POST['order_id'] );
-	$order 		= new WC_Order( $order_id );
-
- 	// Get tax rates
-	$rates = $wpdb->get_results( "SELECT tax_rate_id, tax_rate_country, tax_rate_state, tax_rate_name, tax_rate_priority FROM {$wpdb->prefix}woocommerce_tax_rates ORDER BY tax_rate_name" );
-
-	$tax_codes = array();
-
-	foreach( $rates as $rate ) {
-		$code = array();
-
-		$code[] = $rate->tax_rate_country;
-		$code[] = $rate->tax_rate_state;
-		$code[] = $rate->tax_rate_name ? sanitize_title( $rate->tax_rate_name ) : 'TAX';
-		$code[] = absint( $rate->tax_rate_priority );
-
-		$tax_codes[ $rate->tax_rate_id ] = strtoupper( implode( '-', array_filter( $code ) ) );
-	}
-
-	// Add line item
-   	$item_id = woocommerce_add_order_item( $order_id, array(
- 		'order_item_name' 		=> '',
- 		'order_item_type' 		=> 'tax'
- 	) );
-
- 	// Add line item meta
- 	if ( $item_id ) {
- 		woocommerce_add_order_item_meta( $item_id, 'rate_id', '' );
- 		woocommerce_add_order_item_meta( $item_id, 'label', '' );
-	 	woocommerce_add_order_item_meta( $item_id, 'compound', '' );
-	 	woocommerce_add_order_item_meta( $item_id, 'tax_amount', '' );
-	 	woocommerce_add_order_item_meta( $item_id, 'shipping_tax_amount', '' );
- 	}
-
-	include( 'admin/post-types/writepanels/order-tax-html.php' );
-
-	// Quit out
-	die();
-}
-
-add_action('wp_ajax_woocommerce_add_line_tax', 'woocommerce_add_line_tax');
-
-/**
- * woocommerce_add_line_tax function.
- *
- * @access public
- * @return void
- */
-function woocommerce_remove_line_tax() {
-	global $woocommerce;
-
-	check_ajax_referer( 'calc-totals', 'security' );
-
-	$tax_row_id = absint( $_POST['tax_row_id'] );
-
-	woocommerce_delete_order_item( $tax_row_id );
-
-	// Quit out
-	die();
-}
-
-add_action('wp_ajax_woocommerce_remove_line_tax', 'woocommerce_remove_line_tax');
 
 /**
  * Add order note via ajax
@@ -1471,7 +915,7 @@ function woocommerce_add_order_note() {
 	check_ajax_referer( 'add-order-note', 'security' );
 
 	$post_id 	= (int) $_POST['post_id'];
-	$note		= wp_kses_post( trim( stripslashes( $_POST['note'] ) ) );
+	$note		= wp_kses( trim( stripslashes( $_POST['note'] ) ), array( 'a' => array( 'href' => array(), 'title' => array() ), 'br' => array(), 'em' => array(), 'strong' => array() ) );
 	$note_type	= $_POST['note_type'];
 
 	$is_customer_note = $note_type == 'customer' ? 1 : 0;
@@ -1484,7 +928,7 @@ function woocommerce_add_order_note() {
 		if ($is_customer_note) echo 'customer-note';
 		echo '"><div class="note_content">';
 		echo wpautop( wptexturize( $note ) );
-		echo '</div><p class="meta"><a href="#" class="delete_note">'.__( 'Delete note', 'woocommerce' ).'</a></p>';
+		echo '</div><p class="meta"><a href="#" class="delete_note">'.__('Delete note', 'woocommerce').'</a></p>';
 		echo '</li>';
 
 	}
@@ -1532,8 +976,6 @@ add_action('wp_ajax_woocommerce_delete_order_note', 'woocommerce_delete_order_no
 function woocommerce_json_search_products( $x = '', $post_types = array('product') ) {
 
 	check_ajax_referer( 'search-products', 'security' );
-
-	header( 'Content-Type: application/json; charset=utf-8' );
 
 	$term = (string) urldecode(stripslashes(strip_tags($_GET['term'])));
 
@@ -1603,15 +1045,15 @@ function woocommerce_json_search_products( $x = '', $post_types = array('product
 
 	$found_products = array();
 
-	if ( $posts ) foreach ( $posts as $post ) {
+	if ($posts) foreach ($posts as $post) {
 
-		$product = get_product( $post );
+		$SKU = get_post_meta($post, '_sku', true);
 
-		$found_products[ $post ] = woocommerce_get_formatted_product_name( $product );
+		if (isset($SKU) && $SKU) $SKU = ' (SKU: ' . $SKU . ')';
+
+		$found_products[$post] = get_the_title( $post ) . ' &ndash; #' . $post . $SKU;
 
 	}
-
-	$found_products = apply_filters( 'woocommerce_json_search_found_products', $found_products );
 
 	echo json_encode( $found_products );
 
@@ -1644,14 +1086,12 @@ function woocommerce_json_search_customers() {
 
 	check_ajax_referer( 'search-customers', 'security' );
 
-	header( 'Content-Type: application/json; charset=utf-8' );
-
 	$term = urldecode( stripslashes( strip_tags( $_GET['term'] ) ) );
 
 	if ( empty( $term ) )
 		die();
 
-	$default = isset( $_GET['default'] ) ? $_GET['default'] : __( 'Guest', 'woocommerce' );
+	$default = isset( $_GET['default'] ) ? $_GET['default'] : __('Guest', 'woocommerce');
 
 	$found_customers = array( '' => $default );
 
@@ -1666,7 +1106,7 @@ function woocommerce_json_search_customers() {
 
 	if ( $customers ) {
 		foreach ( $customers as $customer ) {
-			$found_customers[ $customer->ID ] = $customer->display_name . ' (#' . $customer->ID . ' &ndash; ' . sanitize_email( $customer->user_email ) . ')';
+			$found_customers[ $customer->ID ] = $customer->display_name . ' (#' . $customer->ID . ' &ndash; ' . $customer->user_email . ')';
 		}
 	}
 
@@ -1675,6 +1115,63 @@ function woocommerce_json_search_customers() {
 }
 
 add_action('wp_ajax_woocommerce_json_search_customers', 'woocommerce_json_search_customers');
+
+
+/**
+ * Search for products for upsells/crosssells
+ *
+ * @access public
+ * @return void
+ */
+function woocommerce_upsell_crosssell_search_products() {
+
+	check_ajax_referer( 'search-products', 'security' );
+
+	$search = (string) urldecode(stripslashes(strip_tags($_POST['search'])));
+	$name = (string) urldecode(stripslashes(strip_tags($_POST['name'])));
+
+	if (empty($search)) die();
+
+	if (is_numeric($search)) :
+
+		$args = array(
+			'post_type'	=> 'product',
+			'post_status' => 'publish',
+			'posts_per_page' => 15,
+			'post__in' => array(0, $search)
+		);
+
+	else :
+
+		$args = array(
+			'post_type'	=> 'product',
+			'post_status' => 'publish',
+			'posts_per_page' => 15,
+			's' => $search
+		);
+
+	endif;
+
+	$posts = apply_filters('woocommerce_upsell_crosssell_search_products', get_posts( $args ));
+
+	if ($posts) : foreach ($posts as $post) :
+
+		$SKU = get_post_meta($post->ID, '_sku', true);
+
+		?>
+		<li rel="<?php echo $post->ID; ?>"><button type="button" name="Add" class="button add_crosssell" title="Add"><?php _e('Cross-sell', 'woocommerce'); ?> &rarr;</button><button type="button" name="Add" class="button add_upsell" title="Add"><?php _e('Up-sell', 'woocommerce'); ?> &rarr;</button><strong><?php echo $post->post_title; ?></strong> &ndash; #<?php echo $post->ID; ?> <?php if (isset($SKU) && $SKU) echo 'SKU: '.$SKU; ?><input type="hidden" class="product_id" value="0" /></li>
+		<?php
+
+	endforeach; else :
+
+		?><li><?php _e('No products found', 'woocommerce'); ?></li><?php
+
+	endif;
+
+	die();
+}
+
+add_action('wp_ajax_woocommerce_upsell_crosssell_search_products', 'woocommerce_upsell_crosssell_search_products');
 
 
 /**
@@ -1718,26 +1215,24 @@ function woocommerce_product_ordering() {
 	global $wpdb;
 
 	// check permissions again and make sure we have what we need
-	if ( ! current_user_can('edit_products') || empty( $_POST['id'] ) || ( ! isset( $_POST['previd'] ) && ! isset( $_POST['nextid'] ) ) )
+	if ( ! current_user_can('edit_others_pages') || empty( $_POST['id'] ) || ( ! isset( $_POST['previd'] ) && ! isset( $_POST['nextid'] ) ) )
 		die(-1);
 
 	// real post?
 	if ( ! $post = get_post( $_POST['id'] ) )
 		die(-1);
 
-	header( 'Content-Type: application/json; charset=utf-8' );
-
 	$previd = isset( $_POST['previd'] ) ? $_POST['previd'] : false;
 	$nextid = isset( $_POST['nextid'] ) ? $_POST['nextid'] : false;
 	$new_pos = array(); // store new positions for ajax
 
-	$siblings = $wpdb->get_results( $wpdb->prepare('
-		SELECT ID, menu_order FROM %1$s AS posts
-		WHERE 	posts.post_type 	= \'product\'
-		AND 	posts.post_status 	IN ( \'publish\', \'pending\', \'draft\', \'future\', \'private\' )
-		AND 	posts.ID			NOT IN (%2$d)
-		ORDER BY posts.menu_order ASC, posts.ID DESC
-	', $wpdb->posts, $post->ID) );
+	$siblings = $wpdb->get_results("
+		SELECT ID, menu_order FROM {$wpdb->posts} AS posts
+		WHERE 	posts.post_type 	= 'product'
+		AND 	posts.post_status 	IN ( 'publish', 'pending', 'draft', 'future', 'private' )
+		AND 	posts.ID			NOT IN ( {$post->ID} )
+		ORDER BY posts.menu_order ASC, posts.post_title ASC
+	");
 
 	$menu_order = 0;
 

@@ -8,10 +8,8 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 // Only hook in admin parts if the user has admin access
-if ( current_user_can( 'view_woocommerce_reports' ) || current_user_can( 'manage_woocommerce' ) || current_user_can( 'publish_shop_orders' ) )
+if ( current_user_can( 'view_woocommerce_reports' ) || current_user_can( 'manage_woocommerce_orders' )|| current_user_can( 'manage_woocommerce' ) )
 	add_action( 'wp_dashboard_setup', 'woocommerce_init_dashboard_widgets' );
 
 /**
@@ -37,17 +35,16 @@ function woocommerce_init_dashboard_widgets() {
 		$sales_heading .= '<a href="index.php?wc_sales_month='.($current_month_offset+1).'" class="next">'.date_i18n('F', strtotime('01-'.($the_month_num+1).'-2011')).' &rarr;</a>';
 	endif;
 
-	$sales_heading .= '<a href="index.php?wc_sales_month='.($current_month_offset-1).'" class="previous">&larr; '.date_i18n('F', strtotime('01-'.($the_month_num-1).'-2011')).'</a><span>'.__( 'Monthly Sales', 'woocommerce' ).'</span>';
+	$sales_heading .= '<a href="index.php?wc_sales_month='.($current_month_offset-1).'" class="previous">&larr; '.date_i18n('F', strtotime('01-'.($the_month_num-1).'-2011')).'</a><span>'.__('Monthly Sales', 'woocommerce').'</span>';
 
-	if ( current_user_can( 'publish_shop_orders' ) ) {
-		wp_add_dashboard_widget( 'woocommerce_dashboard_right_now', __( 'WooCommerce Right Now', 'woocommerce' ), 'woocommerce_dashboard_widget_right_now' );
-		wp_add_dashboard_widget( 'woocommerce_dashboard_recent_orders', __( 'WooCommerce Recent Orders', 'woocommerce' ), 'woocommerce_dashboard_recent_orders');
-		wp_add_dashboard_widget( 'woocommerce_dashboard_recent_reviews', __( 'WooCommerce Recent Reviews', 'woocommerce' ), 'woocommerce_dashboard_recent_reviews' );
-	}
-
-	if ( current_user_can( 'view_woocommerce_reports' ) || current_user_can( 'publish_shop_orders' ) ) {
-		wp_add_dashboard_widget( 'woocommerce_dashboard_sales', $sales_heading, 'woocommerce_dashboard_sales' );
-	}
+	if(current_user_can('manage_woocommerce_orders')){
+            wp_add_dashboard_widget( 'woocommerce_dashboard_right_now', __( 'WooCommerce Right Now', 'woocommerce' ), 'woocommerce_dashboard_widget_right_now' );
+            wp_add_dashboard_widget('woocommerce_dashboard_recent_orders', __('WooCommerce Recent Orders', 'woocommerce'), 'woocommerce_dashboard_recent_orders');
+            wp_add_dashboard_widget('woocommerce_dashboard_recent_reviews', __('WooCommerce Recent Reviews', 'woocommerce'), 'woocommerce_dashboard_recent_reviews');
+        }
+	if(current_user_can('view_woocommerce_reports') || current_user_can('manage_woocommerce_orders')){
+            wp_add_dashboard_widget('woocommerce_dashboard_sales', $sales_heading, 'woocommerce_dashboard_sales');
+        }
 
 }
 
@@ -81,10 +78,10 @@ function woocommerce_dashboard_widget_right_now() {
 
 				<?php
 					$num  = number_format_i18n( $product_count->publish );
-					$text = _n( 'Product', 'Products', intval( $product_count->publish ), 'woocommerce' );
+					$text = _n( 'Product', 'Products', intval($product_count->publish), 'woocommerce' );
 					$link = add_query_arg( array( 'post_type' => 'product' ), get_admin_url( null, 'edit.php' ) );
-					$num  = '<a href="' . esc_url($link ) . '">' . esc_html( $num )  . '</a>';
-					$text = '<a href="' . esc_url( $link ) . '">' . esc_html( $text ) . '</a>';
+					$num  = '<a href="' . $link . '">' . $num  . '</a>';
+					$text = '<a href="' . $link . '">' . $text . '</a>';
 				?>
 
 				<td class="first b b-products"><?php echo $num; ?></td>
@@ -97,8 +94,8 @@ function woocommerce_dashboard_widget_right_now() {
 					$num  = number_format_i18n( $product_cat_count );
 					$text = _n( 'Product Category', 'Product Categories', $product_cat_count, 'woocommerce' );
 					$link = add_query_arg( array( 'taxonomy' => 'product_cat', 'post_type' => 'product' ), get_admin_url( null, 'edit-tags.php' ) );
-					$num  = '<a href="' . esc_url($link ) . '">' . esc_html( $num )  . '</a>';
-					$text = '<a href="' . esc_url( $link ) . '">' . esc_html( $text ) . '</a>';
+					$num  = '<a href="' . $link . '">' . $num  . '</a>';
+					$text = '<a href="' . $link . '">' . $text . '</a>';
 				?>
 
 				<td class="first b b-product_cats"><?php echo $num; ?></td>
@@ -111,8 +108,8 @@ function woocommerce_dashboard_widget_right_now() {
 					$num  = number_format_i18n( $product_tag_count );
 					$text = _n( 'Product Tag', 'Product Tags', $product_tag_count, 'woocommerce' );
 					$link = add_query_arg( array( 'taxonomy' => 'product_tag', 'post_type' => 'product' ), get_admin_url( null, 'edit-tags.php' ) );
-					$num  = '<a href="' . esc_url($link ) . '">' . esc_html( $num )  . '</a>';
-					$text = '<a href="' . esc_url( $link ) . '">' . esc_html( $text ) . '</a>';
+					$num  = '<a href="' . $link . '">' . $num  . '</a>';
+					$text = '<a href="' . $link . '">' . $text . '</a>';
 				?>
 
 				<td class="first b b-product_tag"><?php echo $num; ?></td>
@@ -125,8 +122,8 @@ function woocommerce_dashboard_widget_right_now() {
 					$num  = number_format_i18n( $product_attr_count );
 					$text = _n( 'Attribute', 'Attributes', $product_attr_count, 'woocommerce' );
 					$link = add_query_arg( array( 'page' => 'woocommerce_attributes' ), get_admin_url( null, 'admin.php' ) );
-					$num  = '<a href="' . esc_url($link ) . '">' . esc_html( $num )  . '</a>';
-					$text = '<a href="' . esc_url( $link ) . '">' . esc_html( $text ) . '</a>';
+					$num  = '<a href="' . $link . '">' . $num  . '</a>';
+					$text = '<a href="' . $link . '">' . $text . '</a>';
 				?>
 
 				<td class="first b b-attributes"><?php echo $num; ?></td>
@@ -147,8 +144,8 @@ function woocommerce_dashboard_widget_right_now() {
 					$num  = number_format_i18n( $pending_count );
 					$text = __( 'Pending', 'woocommerce' );
 					$link = add_query_arg( array( 'post_type' => 'shop_order', 'shop_order_status' => 'pending' ), get_admin_url( null, 'edit.php' ) );
-					$num  = '<a href="' . esc_url($link ) . '">' . esc_html( $num )  . '</a>';
-					$text = '<a href="' . esc_url( $link ) . '">' . esc_html( $text ) . '</a>';
+					$num  = '<a href="' . $link . '">' . $num  . '</a>';
+					$text = '<a href="' . $link . '">' . $text . '</a>';
 				?>
 
 				<td class="b b-pending"><?php echo $num; ?></td>
@@ -161,8 +158,8 @@ function woocommerce_dashboard_widget_right_now() {
 					$num  = number_format_i18n( $on_hold_count );
 					$text = __( 'On-Hold', 'woocommerce' );
 					$link = add_query_arg( array( 'post_type' => 'shop_order', 'shop_order_status' => 'on-hold' ), get_admin_url( null, 'edit.php' ) );
-					$num  = '<a href="' . esc_url($link ) . '">' . esc_html( $num )  . '</a>';
-					$text = '<a href="' . esc_url( $link ) . '">' . esc_html( $text ) . '</a>';
+					$num  = '<a href="' . $link . '">' . $num  . '</a>';
+					$text = '<a href="' . $link . '">' . $text . '</a>';
 				?>
 
 				<td class="b b-on-hold"><?php echo $num; ?></td>
@@ -175,8 +172,8 @@ function woocommerce_dashboard_widget_right_now() {
 					$num  = number_format_i18n( $processing_count );
 					$text = __( 'Processing', 'woocommerce' );
 					$link = add_query_arg( array( 'post_type' => 'shop_order', 'shop_order_status' => 'processing' ), get_admin_url( null, 'edit.php' ) );
-					$num  = '<a href="' . esc_url($link ) . '">' . esc_html( $num )  . '</a>';
-					$text = '<a href="' . esc_url( $link ) . '">' . esc_html( $text ) . '</a>';
+					$num  = '<a href="' . $link . '">' . $num  . '</a>';
+					$text = '<a href="' . $link . '">' . $text . '</a>';
 				?>
 
 				<td class="b b-processing"><?php echo $num; ?></td>
@@ -189,8 +186,8 @@ function woocommerce_dashboard_widget_right_now() {
 					$num  = number_format_i18n( $completed_count );
 					$text = __( 'Completed', 'woocommerce' );
 					$link = add_query_arg( array( 'post_type' => 'shop_order', 'shop_order_status' => 'completed' ), get_admin_url( null, 'edit.php' ) );
-					$num  = '<a href="' . esc_url($link ) . '">' . esc_html( $num )  . '</a>';
-					$text = '<a href="' . esc_url( $link ) . '">' . esc_html( $text ) . '</a>';
+					$num  = '<a href="' . $link . '">' . $num  . '</a>';
+					$text = '<a href="' . $link . '">' . $text . '</a>';
 				?>
 
 				<td class="b b-completed"><?php echo $num; ?></td>
@@ -235,8 +232,8 @@ function woocommerce_dashboard_recent_orders() {
 
 			echo '
 			<li>
-				<span class="order-status '.sanitize_title($this_order->status).'">'.ucwords(__($this_order->status, 'woocommerce')).'</span> <a href="'.admin_url('post.php?post='.$order->ID).'&action=edit">' . get_the_time( __( 'l jS \of F Y h:i:s A', 'woocommerce' ), $order->ID ) . '</a><br />
-				<small>'.sizeof($this_order->get_items()).' '._n('item', 'items', sizeof($this_order->get_items()), 'woocommerce').' <span class="order-cost">'.__('Total:', 'woocommerce' ) . ' ' . woocommerce_price($this_order->order_total).'</span></small>
+				<span class="order-status '.sanitize_title($this_order->status).'">'.ucwords(__($this_order->status, 'woocommerce')).'</span> <a href="'.admin_url('post.php?post='.$order->ID).'&action=edit">' . get_the_time( __('l jS \of F Y h:i:s A', 'woocommerce' ), $order->ID ) . '</a><br />
+				<small>'.sizeof($this_order->get_items()).' '._n('item', 'items', sizeof($this_order->get_items()), 'woocommerce').' <span class="order-cost">'.__('Total:', 'woocommerce') . ' ' . woocommerce_price($this_order->order_total).'</span></small>
 			</li>';
 
 		endforeach;
@@ -255,7 +252,7 @@ function woocommerce_dashboard_recent_orders() {
  */
 function woocommerce_dashboard_recent_reviews() {
 	global $wpdb;
-	$comments = $wpdb->get_results( "SELECT *, SUBSTRING(comment_content,1,100) AS comment_excerpt
+	$comments = $wpdb->get_results("SELECT *, SUBSTRING(comment_content,1,100) AS comment_excerpt
 	FROM $wpdb->comments
 	LEFT JOIN $wpdb->posts ON ($wpdb->comments.comment_post_ID = $wpdb->posts.ID)
 	WHERE comment_approved = '1'
@@ -265,27 +262,27 @@ function woocommerce_dashboard_recent_reviews() {
 	ORDER BY comment_date_gmt DESC
 	LIMIT 5" );
 
-	if ( $comments ) {
+	if ($comments) :
 		echo '<ul>';
-		foreach ( $comments as $comment ) {
+		foreach ($comments as $comment) :
 
 			echo '<li>';
 
-			echo get_avatar( $comment->comment_author, '32' );
+			echo get_avatar($comment->comment_author, '32');
 
 			$rating = get_comment_meta( $comment->comment_ID, 'rating', true );
 
-			echo '<div class="star-rating" title="' . $rating . '">
-				<span style="width:'. ( $rating * 20 ) . '%">' . $rating . ' ' . __( 'out of 5', 'woocommerce' ) . '</span></div>';
+			echo '<div class="star-rating" title="'.$rating.'">
+				<span style="width:'.($rating*10).'px">'.$rating.' '.__('out of 5', 'woocommerce').'</span></div>';
 
-			echo '<h4 class="meta"><a href="' . get_permalink( $comment->ID ) . '#comment-' . absint( $comment->comment_ID ) .'">' . esc_html__( $comment->post_title ) . '</a> reviewed by ' . esc_html( $comment->comment_author ) .'</h4>';
-			echo '<blockquote>' . wp_kses_data( $comment->comment_excerpt ) . ' [...]</blockquote></li>';
+			echo '<h4 class="meta"><a href="'.get_permalink($comment->ID).'#comment-'.$comment->comment_ID .'">'.$comment->post_title.'</a> reviewed by ' .strip_tags($comment->comment_author) .'</h4>';
+			echo '<blockquote>'.strip_tags($comment->comment_excerpt).' [...]</blockquote></li>';
 
-		}
+		endforeach;
 		echo '</ul>';
-	} else {
-		echo '<p>' . __( 'There are no product reviews yet.', 'woocommerce' ) . '</p>';
-	}
+	else :
+		echo '<p>'.__('There are no product reviews yet.', 'woocommerce').'</p>';
+	endif;
 }
 
 
@@ -422,12 +419,10 @@ function woocommerce_dashboard_sales_js() {
 
 	/* Script variables */
 	$params = array(
-		'currency_symbol' 	=> get_woocommerce_currency_symbol(),
-		'number_of_sales' 	=> absint( array_sum( $order_counts ) ),
-		'sales_amount'    	=> woocommerce_price( array_sum( $order_amounts ) ),
-		'sold' 				=> __( 'Sold', 'woocommerce' ),
-		'earned'    		=> __( 'Earned', 'woocommerce' ),
-		'month_names'     	=> array_values( $wp_locale->month_abbrev ),
+		'currency_symbol' => get_woocommerce_currency_symbol(),
+		'number_of_sales' => __( 'Number of sales', 'woocommerce' ),
+		'sales_amount'    => __( 'Sales amount', 'woocommerce' ),
+		'month_names'     => array_values( $wp_locale->month_abbrev ),
 	);
 
 	$order_counts_array = array();
@@ -447,11 +442,13 @@ function woocommerce_dashboard_sales_js() {
 	// Queue scripts
 	$suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
 
-	wp_register_script( 'woocommerce_dashboard_sales', $woocommerce->plugin_url() . '/assets/js/admin/dashboard_sales' . $suffix . '.js', array( 'jquery', 'flot', 'flot-resize' ), '1.0' );
+	wp_register_script( 'woocommerce_dashboard_sales', $woocommerce->plugin_url() . '/assets/js/admin/dashboard_sales'.$suffix.'.js', 'jquery', '1.0' );
 	wp_register_script( 'flot', $woocommerce->plugin_url() . '/assets/js/admin/jquery.flot'.$suffix.'.js', 'jquery', '1.0' );
 	wp_register_script( 'flot-resize', $woocommerce->plugin_url() . '/assets/js/admin/jquery.flot.resize'.$suffix.'.js', 'jquery', '1.0' );
 
 	wp_localize_script( 'woocommerce_dashboard_sales', 'params', $params );
 
+	wp_print_scripts('flot');
+	wp_print_scripts('flot-resize');
 	wp_print_scripts('woocommerce_dashboard_sales');
 }

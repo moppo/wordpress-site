@@ -5,7 +5,6 @@
  * @class 		WC_Validation
  * @version		1.6.4
  * @package		WooCommerce/Classes
- * @category	Class
  * @author 		WooThemes
  */
 class WC_Validation {
@@ -16,7 +15,7 @@ class WC_Validation {
 	 * @param   string	email address
 	 * @return  bool
 	 */
-	public function is_email( $email ) {
+	function is_email( $email ) {
 		return is_email( $email );
 	}
 
@@ -27,7 +26,7 @@ class WC_Validation {
 	 * @param   string	phone number
 	 * @return  bool
 	 */
-	public function is_phone( $phone ) {
+	function is_phone( $phone ) {
 		if ( strlen( trim( preg_replace( '/[\s\#0-9_\-\+\(\)]/', '', $phone ) ) ) > 0 )
 			return false;
 
@@ -42,7 +41,7 @@ class WC_Validation {
 	 * @param	string	country
 	 * @return  bool
 	 */
-	public function is_postcode( $postcode, $country ) {
+	function is_postcode( $postcode, $country ) {
 		if ( strlen( trim( preg_replace( '/[\s\-A-Za-z0-9]/', '', $postcode ) ) ) > 0 )
 			return false;
 
@@ -68,7 +67,7 @@ class WC_Validation {
 	 * @param mixed $toCheck A postcode
 	 * @return bool
 	 */
-	public function is_GB_postcode( $toCheck ) {
+	function is_GB_postcode( $toCheck ) {
 
 		// Permitted letters depend upon their position in the postcode.
 		$alpha1 = "[abcdefghijklmnoprstuwyz]";                          // Character 1
@@ -129,7 +128,7 @@ class WC_Validation {
 	 * @param	string	country
 	 * @return  string	formatted postcode
 	 */
-	public function format_postcode( $postcode, $country ) {
+	function format_postcode( $postcode, $country ) {
 		$postcode = strtoupper(trim($postcode));
 		$postcode = trim(preg_replace('/[\s]/', '', $postcode));
 
@@ -147,9 +146,23 @@ class WC_Validation {
 	 * @param mixed $tel
 	 * @return string
 	 */
-	public function format_phone( $tel ) {
+	function format_phone( $tel ) {
 		$tel = str_replace( '.', '-', $tel );
 		return $tel;
 	}
 
+}
+
+/**
+ * woocommerce_validation class.
+ *
+ * @extends 	WC_Validation
+ * @deprecated 	1.4
+ * @package		WooCommerce/Classes
+ */
+class woocommerce_validation extends WC_Validation {
+	public function __construct() {
+		_deprecated_function( 'woocommerce_validation', '1.4', 'WC_Validation()' );
+		parent::__construct();
+	}
 }

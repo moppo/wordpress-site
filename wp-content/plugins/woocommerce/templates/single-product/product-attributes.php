@@ -9,8 +9,6 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 global $woocommerce;
 
 $alt = 1;
@@ -25,8 +23,8 @@ if ( empty( $attributes ) && ( ! $product->enable_dimensions_display() || ( ! $p
 		<?php if ( $product->has_weight() ) : $alt = $alt * -1; ?>
 
 			<tr class="<?php if ( $alt == 1 ) echo 'alt'; ?>">
-				<th><?php _e( 'Weight', 'woocommerce' ) ?></th>
-				<td class="product_weight"><?php echo $product->get_weight() . ' ' . esc_attr( get_option('woocommerce_weight_unit') ); ?></td>
+				<th><?php _e('Weight', 'woocommerce') ?></th>
+				<td><?php echo $product->get_weight() . ' ' . get_option('woocommerce_weight_unit'); ?></td>
 			</tr>
 
 		<?php endif; ?>
@@ -34,8 +32,8 @@ if ( empty( $attributes ) && ( ! $product->enable_dimensions_display() || ( ! $p
 		<?php if ($product->has_dimensions()) : $alt = $alt * -1; ?>
 
 			<tr class="<?php if ( $alt == 1 ) echo 'alt'; ?>">
-				<th><?php _e( 'Dimensions', 'woocommerce' ) ?></th>
-				<td class="product_dimensions"><?php echo $product->get_dimensions(); ?></td>
+				<th><?php _e('Dimensions', 'woocommerce') ?></th>
+				<td><?php echo $product->get_dimensions(); ?></td>
 			</tr>
 
 		<?php endif; ?>
@@ -61,7 +59,7 @@ if ( empty( $attributes ) && ( ! $product->enable_dimensions_display() || ( ! $p
 				} else {
 
 					// Convert pipes to commas and display values
-					$values = array_map( 'trim', explode( '|', $attribute['value'] ) );
+					$values = explode( '|', $attribute['value'] );
 					echo apply_filters( 'woocommerce_attribute', wpautop( wptexturize( implode( ', ', $values ) ) ), $attribute, $values );
 
 				}

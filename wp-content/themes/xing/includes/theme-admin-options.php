@@ -40,7 +40,7 @@ $options = array (
 						"id" => $shortname."_scheme",
 						"std" => "default",
 						"type" => "select",
-						"options" => array("default", "blue", "cherry", "cyan", "green")),
+						"options" => array("default", "blue", "cherry", "cyan", "green", "red")),
 
 				array(	"name" => __( 'Global Sidebar Placement', 'xing' ),
 						"desc" => __( 'Select a global sidebar placement for blog, archives, author, single, etc.', 'xing' ),

@@ -7,26 +7,19 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 global $woocommerce_loop, $woocommerce, $product;
 
 $crosssells = $woocommerce->cart->get_cross_sells();
 
 if ( sizeof( $crosssells ) == 0 ) return;
 
-$meta_query = array();
-$meta_query[] = $woocommerce->query->visibility_meta_query();
-$meta_query[] = $woocommerce->query->stock_status_meta_query();
-
 $args = array(
-	'post_type'           => 'product',
-	'ignore_sticky_posts' => 1,
-	'posts_per_page'      => 2,
-	'no_found_rows'       => 1,
-	'orderby'             => 'rand',
-	'post__in'            => $crosssells,
-	'meta_query'          => $meta_query
+	'post_type'				=> 'product',
+	'ignore_sticky_posts'	=> 1,
+	'posts_per_page' 		=> 2,
+	'no_found_rows' 		=> 1,
+	'orderby' 				=> 'rand',
+	'post__in' 				=> $crosssells
 );
 
 $products = new WP_Query( $args );
@@ -37,9 +30,9 @@ if ( $products->have_posts() ) : ?>
 
 	<div class="cross-sells">
 
-		<h2><?php _e( 'You may be interested in&hellip;', 'woocommerce' ) ?></h2>
+		<h2><?php _e('You may be interested in&hellip;', 'woocommerce') ?></h2>
 
-		<?php woocommerce_product_loop_start(); ?>
+		<ul class="products">
 
 			<?php while ( $products->have_posts() ) : $products->the_post(); ?>
 
@@ -47,7 +40,7 @@ if ( $products->have_posts() ) : ?>
 
 			<?php endwhile; // end of the loop. ?>
 
-		<?php woocommerce_product_loop_end(); ?>
+		</ul>
 
 	</div>
 

@@ -7,8 +7,6 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 global $woocommerce;
 ?>
 
@@ -29,10 +27,10 @@ global $woocommerce;
 
 	<p class="form-row" id="shiptobilling">
 		<input id="shiptobilling-checkbox" class="input-checkbox" <?php checked($shiptobilling, 1); ?> type="checkbox" name="shiptobilling" value="1" />
-		<label for="shiptobilling-checkbox" class="checkbox"><?php _e( 'Ship to billing address?', 'woocommerce' ); ?></label>
+		<label for="shiptobilling-checkbox" class="checkbox"><?php _e('Ship to billing address?', 'woocommerce'); ?></label>
 	</p>
 
-	<h3><?php _e( 'Shipping Address', 'woocommerce' ); ?></h3>
+	<h3><?php _e('Shipping Address', 'woocommerce'); ?></h3>
 
 	<div class="shipping_address">
 
@@ -56,7 +54,7 @@ global $woocommerce;
 
 	<?php if ($woocommerce->cart->ship_to_billing_address_only()) : ?>
 
-		<h3><?php _e( 'Additional Information', 'woocommerce' ); ?></h3>
+		<h3><?php _e('Additional Information', 'woocommerce'); ?></h3>
 
 	<?php endif; ?>
 

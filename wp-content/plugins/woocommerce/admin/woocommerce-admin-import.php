@@ -11,8 +11,6 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 /**
  * When running the WP importer, ensure attributes exist.
  *
@@ -51,24 +49,24 @@ function woocommerce_import_start() {
 
 								$nicename = strtolower(sanitize_title(str_replace('pa_', '', $domain)));
 
-								$exists_in_db = $wpdb->get_var( $wpdb->prepare( "SELECT attribute_id FROM " . $wpdb->prefix . "woocommerce_attribute_taxonomies WHERE attribute_name = %s;", $nicename ) );
+								$exists_in_db = $wpdb->get_var("SELECT attribute_id FROM ".$wpdb->prefix . "woocommerce_attribute_taxonomies WHERE attribute_name = '".$nicename."';");
 
 								if (!$exists_in_db) :
 
 									// Create the taxonomy
-									$wpdb->insert( $wpdb->prefix . "woocommerce_attribute_taxonomies", array( 'attribute_name' => $nicename, 'attribute_type' => 'select', 'attribute_orderby' => 'menu_order' ), array( '%s', '%s', '%s' ) );
+									$wpdb->insert( $wpdb->prefix . "woocommerce_attribute_taxonomies", array( 'attribute_name' => $nicename, 'attribute_type' => 'select' ), array( '%s', '%s' ) );
 
 								endif;
 
 								// Register the taxonomy now so that the import works!
 								register_taxonomy( $domain,
-							        apply_filters( 'woocommerce_taxonomy_objects_' . $domain, array('product') ),
-							        apply_filters( 'woocommerce_taxonomy_args_' . $domain, array(
+							        array('product'),
+							        array(
 							            'hierarchical' => true,
 							            'show_ui' => false,
 							            'query_var' => true,
 							            'rewrite' => false,
-							        ) )
+							        )
 							    );
 
 							endif;

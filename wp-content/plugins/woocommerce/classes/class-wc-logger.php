@@ -5,16 +5,15 @@
  * @class 		WC_Logger
  * @version		1.6.4
  * @package		WooCommerce/Classes
- * @category	Class
  * @author 		WooThemes
  */
 class WC_Logger {
 
 	/**
-	 * @var array Stores open file _handles.
+	 * @var array Stores open file handles.
 	 * @access private
 	 */
-	private $_handles;
+	private $handles;
 
 	/**
 	 * Constructor for the logger.
@@ -22,8 +21,8 @@ class WC_Logger {
 	 * @access public
 	 * @return void
 	 */
-	public function __construct() {
-		$this->_handles = array();
+	function __construct() {
+		$this->handles = array();
 	}
 
 
@@ -33,9 +32,9 @@ class WC_Logger {
 	 * @access public
 	 * @return void
 	 */
-	public function __destruct() {
-		foreach ( $this->_handles as $handle )
-	       @fclose( escapeshellarg( $handle ) );
+	function __destruct() {
+		foreach ($this->handles as $handle)
+	       fclose( $handle );
 	}
 
 
@@ -49,10 +48,10 @@ class WC_Logger {
 	private function open( $handle ) {
 		global $woocommerce;
 
-		if ( isset( $this->_handles[ $handle ] ) )
+		if ( isset( $this->handles[$handle] ) )
 			return true;
 
-		if ( $this->_handles[ $handle ] = @fopen( $woocommerce->plugin_path() . '/logs/' . $this->file_name( $handle ) . '.txt', 'a' ) )
+		if ( $this->handles[$handle] = @fopen( $woocommerce->plugin_path() . '/logs/' . $handle . '.txt', 'a' ) )
 			return true;
 
 		return false;
@@ -68,15 +67,15 @@ class WC_Logger {
 	 * @return void
 	 */
 	public function add( $handle, $message ) {
-		if ( $this->open( $handle ) && is_resource( $this->_handles[ $handle ] ) ) {
+		if ( $this->open( $handle ) ) {
 			$time = date_i18n( 'm-d-Y @ H:i:s -' ); //Grab Time
-			@fwrite( $this->_handles[ $handle ], $time . " " . $message . "\n" );
+			fwrite( $this->handles[$handle], $time . " " . $message . "\n" );
 		}
 	}
 
 
 	/**
-	 * Clear entries from chosen file.
+	 * Clear entrys from chosen file.
 	 *
 	 * @access public
 	 * @param mixed $handle
@@ -84,20 +83,22 @@ class WC_Logger {
 	 */
 	public function clear( $handle ) {
 
-		if ( $this->open( $handle ) && is_resource( $this->_handles[ $handle ] ) )
-			@ftruncate( $this->_handles[ $handle ], 0 );
+		if ( $this->open( $handle ) )
+			ftruncate( $this->handles[$handle], 0 );
 	}
 
+}
 
-	/**
-	 * file_name function.
-	 *
-	 * @access private
-	 * @param mixed $handle
-	 * @return void
-	 */
-	private function file_name( $handle ) {
-		return $handle . '-' . sanitize_file_name( wp_hash( $handle ) );
+/**
+ * woocommerce_logger class.
+ *
+ * @extends 	WC_Logger
+ * @deprecated 	1.4
+ * @package		WooCommerce/Classes
+ */
+class woocommerce_logger extends WC_Logger {
+	public function __construct() {
+		_deprecated_function( 'woocommerce_logger', '1.4', 'WC_Logger()' );
+		parent::__construct();
 	}
-
 }

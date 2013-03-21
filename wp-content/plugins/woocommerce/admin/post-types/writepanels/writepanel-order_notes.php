@@ -7,10 +7,9 @@
  * @author 		WooThemes
  * @category 	Admin
  * @package 	WooCommerce/Admin/WritePanels
- * @version     2.0.0
+ * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
  * Display the order notes meta box.
@@ -22,54 +21,49 @@ function woocommerce_order_notes_meta_box() {
 	global $woocommerce, $post;
 
 	$args = array(
-		'post_id' 	=> $post->ID,
-		'approve' 	=> 'approve',
-		'type' 		=> 'order_note'
+		'post_id' => $post->ID,
+		'approve' => 'approve',
+		'type' => ''
 	);
 
 	$notes = get_comments( $args );
 
 	echo '<ul class="order_notes">';
 
-	if ( $notes ) {
-		foreach( $notes as $note ) {
-			$note_classes = get_comment_meta( $note->comment_ID, 'is_customer_note', true ) ? array( 'customer-note', 'note' ) : array( 'note' );
+	if ($notes) :
+		foreach($notes as $note) :
 
-			?>
-			<li rel="<?php echo absint( $note->comment_ID ) ; ?>" class="<?php echo implode( ' ', $note_classes ); ?>">
-				<div class="note_content">
-					<?php echo wpautop( wptexturize( wp_kses_post( $note->comment_content ) ) ); ?>
-				</div>
-				<p class="meta">
-					<?php printf( __( 'added %s ago', 'woocommerce' ), human_time_diff( strtotime( $note->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?> <a href="#" class="delete_note"><?php _e( 'Delete note', 'woocommerce' ); ?></a>
-				</p>
-			</li>
-			<?php
-		}
-	} else {
-		echo '<li>' . __( 'There are no notes for this order yet.', 'woocommerce' ) . '</li>';
-	}
+			$customer_note = get_comment_meta($note->comment_ID, 'is_customer_note', true);
+
+			echo '<li rel="'.$note->comment_ID.'" class="note ';
+			if ($customer_note) echo 'customer-note';
+			echo '"><div class="note_content">';
+			echo wpautop( wptexturize( $note->comment_content ) );
+			echo '</div><p class="meta">'. sprintf(__('added %s ago', 'woocommerce'), human_time_diff(strtotime($note->comment_date_gmt), current_time('timestamp', 1))) .' - <a href="#" class="delete_note">'.__('Delete note', 'woocommerce').'</a></p>';
+			echo '</li>';
+		endforeach;
+	else :
+		echo '<li>' . __('There are no notes for this order yet.', 'woocommerce') . '</li>';
+	endif;
 
 	echo '</ul>';
 	?>
 	<div class="add_note">
-		<h4><?php _e( 'Add note', 'woocommerce' ); ?> <img class="help_tip" data-tip='<?php esc_attr_e( 'Add a note for your reference, or add a customer note (the user will be notified).', 'woocommerce' ); ?>' src="<?php echo $woocommerce->plugin_url(); ?>/assets/images/help.png" height="16" width="16" /></h4>
+		<h4><?php _e('Add note', 'woocommerce'); ?> <img class="help_tip" data-tip='<?php esc_attr_e('Add a note for your reference, or add a customer note (the user will be notified).', 'woocommerce'); ?>' src="<?php echo $woocommerce->plugin_url(); ?>/assets/images/help.png" /></h4>
 		<p>
 			<textarea type="text" name="order_note" id="add_order_note" class="input-text" cols="20" rows="5"></textarea>
 		</p>
 		<p>
 			<select name="order_note_type" id="order_note_type">
-				<option value="customer"><?php _e( 'Customer note', 'woocommerce' ); ?></option>
-				<option value=""><?php _e( 'Private note', 'woocommerce' ); ?></option>
+				<option value="customer"><?php _e('Customer note', 'woocommerce'); ?></option>
+				<option value=""><?php _e('Private note', 'woocommerce'); ?></option>
 			</select>
-			<a href="#" class="add_note button"><?php _e( 'Add', 'woocommerce' ); ?></a>
+			<a href="#" class="add_note button"><?php _e('Add', 'woocommerce'); ?></a>
 		</p>
 	</div>
 	<script type="text/javascript">
 
-		jQuery('#woocommerce-order-notes')
-
-		.on( 'click', 'a.add_note', function() {
+		jQuery('a.add_note').click(function(){
 
 			if (!jQuery('textarea#add_order_note').val()) return;
 
@@ -93,9 +87,9 @@ function woocommerce_order_notes_meta_box() {
 
 			return false;
 
-		})
+		});
 
-		.on( 'click', 'a.delete_note', function() {
+		jQuery('a.delete_note').live('click', function(){
 
 			var note = jQuery(this).closest('li.note');
 

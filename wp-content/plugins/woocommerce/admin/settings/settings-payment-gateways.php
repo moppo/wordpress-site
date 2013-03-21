@@ -8,8 +8,6 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 /**
  * Output payment gateway settings.
  *
@@ -24,9 +22,9 @@ function woocommerce_payment_gateways_setting() {
 			<table class="wc_gateways widefat" cellspacing="0">
 				<thead>
 					<tr>
-						<th width="1%"><?php _e( 'Default', 'woocommerce' ); ?></th>
-						<th><?php _e( 'Gateway', 'woocommerce' ); ?></th>
-						<th><?php _e( 'Status', 'woocommerce' ); ?></th>
+						<th width="1%"><?php _e('Default', 'woocommerce'); ?></th>
+						<th><?php _e('Gateway', 'woocommerce'); ?></th>
+						<th><?php _e('Status', 'woocommerce'); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -37,19 +35,19 @@ function woocommerce_payment_gateways_setting() {
 
 		        		echo '<tr>
 		        			<td width="1%" class="radio">
-		        				<input type="radio" name="default_gateway" value="' . esc_attr( $gateway->id ) . '" ' . checked( $default_gateway, esc_attr( $gateway->id ), false ) . ' />
-		        				<input type="hidden" name="gateway_order[]" value="' . esc_attr( $gateway->id ) . '" />
+		        				<input type="radio" name="default_gateway" value="' . $gateway->id . '" ' . checked( $default_gateway, $gateway->id, false ) . ' />
+		        				<input type="hidden" name="gateway_order[]" value="' . $gateway->id . '" />
 		        			</td>
 		        			<td>
 		        				<p><strong>' . $gateway->get_title() . '</strong><br/>
-		        				<small>' . __( 'Gateway ID', 'woocommerce' ) . ': ' . esc_html( $gateway->id ) . '</small></p>
+		        				<small>' . __('Gateway ID', 'woocommerce') . ': ' . $gateway->id . '</small></p>
 		        			</td>
 		        			<td>';
 
 		        		if ( $gateway->enabled == 'yes' )
-		        			echo '<img src="' . $woocommerce->plugin_url() . '/assets/images/success@2x.png" width="16" height="14" alt="yes" />';
+		        			echo '<img src="' . $woocommerce->plugin_url() . '/assets/images/success.png" alt="yes" />';
 						else
-							echo '<img src="' . $woocommerce->plugin_url() . '/assets/images/success-off@2x.png" width="16" height="14" alt="no" />';
+							echo '<img src="' . $woocommerce->plugin_url() . '/assets/images/success-off.png" alt="no" />';
 
 		        		echo '</td>
 		        		</tr>';

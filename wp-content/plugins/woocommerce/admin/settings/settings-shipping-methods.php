@@ -8,8 +8,6 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 /**
  * Output shipping method settings.
  *
@@ -20,22 +18,22 @@ function woocommerce_shipping_methods_setting() {
 	global $woocommerce;
 	?>
 	<tr valign="top">
-		<th scope="row" class="titledesc"><?php _e( 'Shipping Methods', 'woocommerce' ) ?></th>
+		<th scope="row" class="titledesc"><?php _e('Shipping Methods', 'woocommerce') ?></th>
 	    <td class="forminp">
-	    	<p class="description" style="margin-top: 0;"><?php _e( 'Drag and drop methods to control their display order.', 'woocommerce' ); ?></p>
+	    	<p class="description" style="margin-top: 0;"><?php _e('Drag and drop methods to control their display order.', 'woocommerce'); ?></p>
 			<table class="wc_shipping widefat" cellspacing="0">
 				<thead>
 					<tr>
-						<th><?php _e( 'Default', 'woocommerce' ); ?></th>
-						<th><?php _e( 'Shipping Method', 'woocommerce' ); ?></th>
-						<th><?php _e( 'Status', 'woocommerce' ); ?></th>
+						<th><?php _e('Default', 'woocommerce'); ?></th>
+						<th><?php _e('Shipping Method', 'woocommerce'); ?></th>
+						<th><?php _e('Status', 'woocommerce'); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 			    	<?php
 			    	foreach ( $woocommerce->shipping->load_shipping_methods() as $method ) {
 
-				    	$default_shipping_method = esc_attr( get_option('woocommerce_default_shipping_method') );
+				    	$default_shipping_method = get_option('woocommerce_default_shipping_method');
 
 				    	echo '<tr>
 				    		<td width="1%" class="radio">
@@ -43,14 +41,14 @@ function woocommerce_shipping_methods_setting() {
 				    			<input type="hidden" name="method_order[]" value="' . $method->id . '" />
 				    			<td>
 				    				<p><strong>' . $method->get_title() . '</strong><br/>
-				    				<small>' . __( 'Method ID', 'woocommerce' ) . ': ' . $method->id . '</small></p>
+				    				<small>' . __('Method ID', 'woocommerce') . ': ' . $method->id . '</small></p>
 				    			</td>
 				    			<td>';
 
 			    		if ($method->enabled == 'yes')
-			    			echo '<img src="' . $woocommerce->plugin_url() . '/assets/images/success@2x.png" width="16 height="14" alt="yes" />';
+			    			echo '<img src="' . $woocommerce->plugin_url() . '/assets/images/success.png" alt="yes" />';
 						else
-							echo '<img src="' . $woocommerce->plugin_url() . '/assets/images/success-off@2x.png" width="16" height="14" alt="no" />';
+							echo '<img src="' . $woocommerce->plugin_url() . '/assets/images/success-off.png" alt="no" />';
 
 			    		echo '</td>
 			    		</tr>';

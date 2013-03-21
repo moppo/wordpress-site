@@ -10,8 +10,6 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 /**
  * Define columns to show on the users page.
  *
@@ -23,10 +21,10 @@ function woocommerce_user_columns( $columns ) {
 	if ( ! current_user_can( 'manage_woocommerce' ) )
 		return $columns;
 
-	$columns['woocommerce_billing_address'] = __( 'Billing Address', 'woocommerce' );
-	$columns['woocommerce_shipping_address'] = __( 'Shipping Address', 'woocommerce' );
-	$columns['woocommerce_paying_customer'] = __( 'Paying Customer?', 'woocommerce' );
-	$columns['woocommerce_order_count'] = __( 'Completed Orders', 'woocommerce' );
+	$columns['woocommerce_billing_address'] = __('Billing Address', 'woocommerce');
+	$columns['woocommerce_shipping_address'] = __('Shipping Address', 'woocommerce');
+	$columns['woocommerce_paying_customer'] = __('Paying Customer?', 'woocommerce');
+	$columns['woocommerce_order_count'] = __('Orders', 'woocommerce');
 	return $columns;
 }
 
@@ -44,31 +42,18 @@ add_filter( 'manage_users_columns', 'woocommerce_user_columns', 10, 1 );
  */
 function woocommerce_user_column_values( $value, $column_name, $user_id ) {
 	global $woocommerce, $wpdb;
-	switch ( $column_name ) :
+	switch ($column_name) :
 		case "woocommerce_order_count" :
 
-			if ( ! $count = get_user_meta( $user_id, '_order_count', true ) ) {
+			$count = $wpdb->get_var( "SELECT COUNT(*)
+			FROM $wpdb->posts
+			LEFT JOIN $wpdb->postmeta ON $wpdb->posts.ID = $wpdb->postmeta.post_id
+			WHERE meta_value = $user_id
+			AND meta_key = '_customer_user'
+			AND post_type IN ('shop_order')
+			AND post_status = 'publish'" );
 
-				$count = $wpdb->get_var( "SELECT COUNT(*)
-					FROM $wpdb->posts as posts
-
-					LEFT JOIN {$wpdb->postmeta} AS meta ON posts.ID = meta.post_id
-					LEFT JOIN {$wpdb->term_relationships} AS rel ON posts.ID=rel.object_ID
-					LEFT JOIN {$wpdb->term_taxonomy} AS tax USING( term_taxonomy_id )
-					LEFT JOIN {$wpdb->terms} AS term USING( term_id )
-
-					WHERE 	meta.meta_key 		= '_customer_user'
-					AND 	posts.post_type 	= 'shop_order'
-					AND 	posts.post_status 	= 'publish'
-					AND 	tax.taxonomy		= 'shop_order_status'
-					AND		term.slug			IN ( 'completed' )
-					AND 	meta_value 			= $user_id
-				" );
-
-				update_user_meta( $user_id, '_order_count', $count );
-			}
-
-			$value = '<a href="' . admin_url( 'edit.php?post_status=all&post_type=shop_order&shop_order_status=completed&_customer_user=' . absint( $user_id ) . '' ) . '">' . absint( $count ) . '</a>';
+			$value = '<a href="'.admin_url('edit.php?post_status=all&post_type=shop_order&_customer_user='.$user_id.'').'">'.$count.'</a>';
 
 		break;
 		case "woocommerce_billing_address" :
@@ -86,12 +71,9 @@ function woocommerce_user_column_values( $value, $column_name, $user_id ) {
 
 			$formatted_address = $woocommerce->countries->get_formatted_address( $address );
 
-			if ( ! $formatted_address )
-				$value = __( 'N/A', 'woocommerce' );
-			else
-				$value = $formatted_address;
+			if (!$formatted_address) $value = __('N/A', 'woocommerce'); else $value = $formatted_address;
 
-			$value = wpautop( $value );
+			$value = wpautop($value);
 		break;
 		case "woocommerce_shipping_address" :
 			$address = array(
@@ -108,21 +90,16 @@ function woocommerce_user_column_values( $value, $column_name, $user_id ) {
 
 			$formatted_address = $woocommerce->countries->get_formatted_address( $address );
 
-			if ( ! $formatted_address )
-				$value = __( 'N/A', 'woocommerce' );
-			else
-				$value = $formatted_address;
+			if (!$formatted_address) $value = __('N/A', 'woocommerce'); else $value = $formatted_address;
 
-			$value = wpautop( $value );
+			$value = wpautop($value);
 		break;
 		case "woocommerce_paying_customer" :
 
 			$paying_customer = get_user_meta( $user_id, 'paying_customer', true );
 
-			if ( $paying_customer )
-				$value = '<img src="' . $woocommerce->plugin_url() . '/assets/images/success@2x.png" alt="yes" width="16px" />';
-			else
-				$value = '<img src="' . $woocommerce->plugin_url() . '/assets/images/success-off@2x.png" alt="no" width="16px" />';
+			if ($paying_customer) $value = '<img src="'.$woocommerce->plugin_url().'/assets/images/success.png" alt="yes" />';
+			else $value = '<img src="'.$woocommerce->plugin_url().'/assets/images/success-off.png" alt="no" />';
 
 		break;
 	endswitch;
@@ -141,92 +118,92 @@ add_action( 'manage_users_custom_column', 'woocommerce_user_column_values', 10, 
 function woocommerce_get_customer_meta_fields() {
 	$show_fields = apply_filters('woocommerce_customer_meta_fields', array(
 		'billing' => array(
-			'title' => __( 'Customer Billing Address', 'woocommerce' ),
+			'title' => __('Customer Billing Address', 'woocommerce'),
 			'fields' => array(
 				'billing_first_name' => array(
-						'label' => __( 'First name', 'woocommerce' ),
+						'label' => __('First name', 'woocommerce'),
 						'description' => ''
 					),
 				'billing_last_name' => array(
-						'label' => __( 'Last name', 'woocommerce' ),
+						'label' => __('Last name', 'woocommerce'),
 						'description' => ''
 					),
 				'billing_company' => array(
-						'label' => __( 'Company', 'woocommerce' ),
+						'label' => __('Company', 'woocommerce'),
 						'description' => ''
 					),
 				'billing_address_1' => array(
-						'label' => __( 'Address 1', 'woocommerce' ),
+						'label' => __('Address 1', 'woocommerce'),
 						'description' => ''
 					),
 				'billing_address_2' => array(
-						'label' => __( 'Address 2', 'woocommerce' ),
+						'label' => __('Address 2', 'woocommerce'),
 						'description' => ''
 					),
 				'billing_city' => array(
-						'label' => __( 'City', 'woocommerce' ),
+						'label' => __('City', 'woocommerce'),
 						'description' => ''
 					),
 				'billing_postcode' => array(
-						'label' => __( 'Postcode', 'woocommerce' ),
+						'label' => __('Postcode', 'woocommerce'),
 						'description' => ''
 					),
 				'billing_state' => array(
-						'label' => __( 'State/County', 'woocommerce' ),
-						'description' => __( 'Country or state code', 'woocommerce' ),
+						'label' => __('State/County', 'woocommerce'),
+						'description' => __('Country or state code', 'woocommerce'),
 					),
 				'billing_country' => array(
-						'label' => __( 'Country', 'woocommerce' ),
-						'description' => __( '2 letter Country code', 'woocommerce' ),
+						'label' => __('Country', 'woocommerce'),
+						'description' => __('2 letter Country code', 'woocommerce'),
 					),
 				'billing_phone' => array(
-						'label' => __( 'Telephone', 'woocommerce' ),
+						'label' => __('Telephone', 'woocommerce'),
 						'description' => ''
 					),
 				'billing_email' => array(
-						'label' => __( 'Email', 'woocommerce' ),
+						'label' => __('Email', 'woocommerce'),
 						'description' => ''
 					)
 			)
 		),
 		'shipping' => array(
-			'title' => __( 'Customer Shipping Address', 'woocommerce' ),
+			'title' => __('Customer Shipping Address', 'woocommerce'),
 			'fields' => array(
 				'shipping_first_name' => array(
-						'label' => __( 'First name', 'woocommerce' ),
+						'label' => __('First name', 'woocommerce'),
 						'description' => ''
 					),
 				'shipping_last_name' => array(
-						'label' => __( 'Last name', 'woocommerce' ),
+						'label' => __('Last name', 'woocommerce'),
 						'description' => ''
 					),
 				'shipping_company' => array(
-						'label' => __( 'Company', 'woocommerce' ),
+						'label' => __('Company', 'woocommerce'),
 						'description' => ''
 					),
 				'shipping_address_1' => array(
-						'label' => __( 'Address 1', 'woocommerce' ),
+						'label' => __('Address 1', 'woocommerce'),
 						'description' => ''
 					),
 				'shipping_address_2' => array(
-						'label' => __( 'Address 2', 'woocommerce' ),
+						'label' => __('Address 2', 'woocommerce'),
 						'description' => ''
 					),
 				'shipping_city' => array(
-						'label' => __( 'City', 'woocommerce' ),
+						'label' => __('City', 'woocommerce'),
 						'description' => ''
 					),
 				'shipping_postcode' => array(
-						'label' => __( 'Postcode', 'woocommerce' ),
+						'label' => __('Postcode', 'woocommerce'),
 						'description' => ''
 					),
 				'shipping_state' => array(
-						'label' => __( 'State/County', 'woocommerce' ),
-						'description' => __( 'State/County or state code', 'woocommerce' )
+						'label' => __('State/County', 'woocommerce'),
+						'description' => __('State/County or state code', 'woocommerce')
 					),
 				'shipping_country' => array(
-						'label' => __( 'Country', 'woocommerce' ),
-						'description' => __( '2 letter Country code', 'woocommerce' )
+						'label' => __('Country', 'woocommerce'),
+						'description' => __('2 letter Country code', 'woocommerce')
 					)
 			)
 		)
@@ -256,10 +233,10 @@ function woocommerce_customer_meta_fields( $user ) {
 			foreach( $fieldset['fields'] as $key => $field ) :
 				?>
 				<tr>
-					<th><label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $field['label'] ); ?></label></th>
+					<th><label for="<?php echo $key; ?>"><?php echo $field['label']; ?></label></th>
 					<td>
-						<input type="text" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_user_meta( $user->ID, $key, true ) ); ?>" class="regular-text" /><br/>
-						<span class="description"><?php echo wp_kses_post( $field['description'] ); ?></span>
+						<input type="text" name="<?php echo $key; ?>" id="<?php echo $key; ?>" value="<?php echo esc_attr( get_user_meta( $user->ID, $key, true ) ); ?>" class="regular-text" /><br/>
+						<span class="description"><?php echo $field['description']; ?></span>
 					</td>
 				</tr>
 				<?php
@@ -290,7 +267,7 @@ function woocommerce_save_customer_meta_fields( $user_id ) {
  	foreach( $save_fields as $fieldset )
  		foreach( $fieldset['fields'] as $key => $field )
  			if ( isset( $_POST[ $key ] ) )
- 				update_user_meta( $user_id, $key, woocommerce_clean( $_POST[ $key ] ) );
+ 				update_user_meta( $user_id, $key, trim( esc_attr( $_POST[ $key ] ) ) );
 }
 
 add_action( 'personal_options_update', 'woocommerce_save_customer_meta_fields' );

@@ -13,17 +13,22 @@ if( !defined('WP_UNINSTALL_PLUGIN') ) exit();
 
 global $wpdb, $wp_roles;
 
-// Roles + caps
-if ( ! function_exists( 'woocommerce_remove_roles' ) )
-	include_once( 'woocommerce-core-functions.php' );
+// Roles
+remove_role( 'customer' );
+remove_role( 'shop_manager' );
 
-if ( function_exists( 'woocommerce_remove_roles' ) )
-	woocommerce_remove_roles();
+// Capabilities
+$wp_roles->remove_cap( 'administrator', 'manage_woocommerce' );
+$wp_roles->remove_cap( 'administrator', 'manage_woocommerce_orders' );
+$wp_roles->remove_cap( 'administrator', 'manage_woocommerce_coupons' );
+$wp_roles->remove_cap( 'administrator', 'manage_woocommerce_products' );
+$wp_roles->remove_cap( 'administrator', 'view_woocommerce_reports' );
 
 // Pages
 wp_delete_post( get_option('woocommerce_shop_page_id'), true );
 wp_delete_post( get_option('woocommerce_cart_page_id'), true );
 wp_delete_post( get_option('woocommerce_checkout_page_id'), true );
+wp_delete_post( get_option('woocommerce_order_tracking_page_id'), true );
 wp_delete_post( get_option('woocommerce_myaccount_page_id'), true );
 wp_delete_post( get_option('woocommerce_edit_address_page_id'), true );
 wp_delete_post( get_option('woocommerce_view_order_page_id'), true );
@@ -41,8 +46,6 @@ $wpdb->query( "DROP TABLE IF EXISTS " . $wpdb->prefix . "woocommerce_downloadabl
 $wpdb->query( "DROP TABLE IF EXISTS " . $wpdb->prefix . "woocommerce_termmeta" );
 $wpdb->query( "DROP TABLE IF EXISTS " . $wpdb->base_prefix . "shareyourcart_tokens" );
 $wpdb->query( "DROP TABLE IF EXISTS " . $wpdb->base_prefix . "shareyourcart_coupons" );
-$wpdb->query( "DROP TABLE IF EXISTS " . $wpdb->prefix . "woocommerce_tax_rates" );
-$wpdb->query( "DROP TABLE IF EXISTS " . $wpdb->prefix . "woocommerce_tax_rate_locations" );
 
 // Delete options
 $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE 'woocommerce_%';");

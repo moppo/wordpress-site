@@ -8,9 +8,6 @@
  * @package		WooCommerce/Classes/Walkers
  * @author 		WooThemes
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 class WC_Product_Cat_Dropdown_Walker extends Walker {
 
 	var $tree_type = 'category';
@@ -26,26 +23,19 @@ class WC_Product_Cat_Dropdown_Walker extends Walker {
 	 * @param array $args
 	 */
 	function start_el(&$output, $cat, $depth, $args) {
-
-		if ( ! empty( $args['hierarchical'] ) )
-			$pad = str_repeat('&nbsp;', $depth * 3);
-		else
-			$pad = '';
+		$pad = str_repeat('&nbsp;', $depth * 3);
 
 		$cat_name = apply_filters( 'list_product_cats', $cat->name, $cat );
+		$output .= "\t<option class=\"level-$depth\" value=\"" . $cat->slug . "\"";
 
-		$value = isset( $args['value'] ) && $args['value'] == 'id' ? $cat->term_id : $cat->slug;
-
-		$output .= "\t<option class=\"level-$depth\" value=\"" . $value . "\"";
-
-		if ( $value == $args['selected'] || ( is_array( $args['selected'] ) && in_array( $value, $args['selected'] ) ) )
+		if ( $cat->slug == $args['selected'] )
 			$output .= ' selected="selected"';
 
 		$output .= '>';
 
 		$output .= $pad . __( $cat_name, 'woocommerce' );
 
-		if ( ! empty( $args['show_count'] ) )
+		if ( $args['show_count'] )
 			$output .= '&nbsp;(' . $cat->count . ')';
 
 		$output .= "</option>\n";

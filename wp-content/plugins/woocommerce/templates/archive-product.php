@@ -6,10 +6,8 @@
  *
  * @author 		WooThemes
  * @package 	WooCommerce/Templates
- * @version     2.0.0
+ * @version     1.6.4
  */
-
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 get_header('shop'); ?>
 
@@ -23,23 +21,37 @@ get_header('shop'); ?>
 		do_action('woocommerce_before_main_content');
 	?>
 
-		<h1 class="page-title"><?php woocommerce_page_title(); ?></h1>
+		<h1 class="page-title">
+			<?php if ( is_search() ) : ?>
+				<?php
+					printf( __( 'Search Results: &ldquo;%s&rdquo;', 'woocommerce' ), get_search_query() );
+					if ( get_query_var( 'paged' ) )
+						printf( __( '&nbsp;&ndash; Page %s', 'woocommerce' ), get_query_var( 'paged' ) );
+				?>
+			<?php elseif ( is_tax() ) : ?>
+				<?php echo single_term_title( "", false ); ?>
+			<?php else : ?>
+				<?php
+					$shop_page = get_post( woocommerce_get_page_id( 'shop' ) );
+
+					echo apply_filters( 'the_title', ( $shop_page_title = get_option( 'woocommerce_shop_page_title' ) ) ? $shop_page_title : $shop_page->post_title );
+				?>
+			<?php endif; ?>
+		</h1>
 
 		<?php do_action( 'woocommerce_archive_description' ); ?>
 
+		<?php if ( is_tax() ) : ?>
+			<?php do_action( 'woocommerce_taxonomy_archive_description' ); ?>
+		<?php elseif ( ! empty( $shop_page ) && is_object( $shop_page ) ) : ?>
+			<?php do_action( 'woocommerce_product_archive_description', $shop_page ); ?>
+		<?php endif; ?>
+
 		<?php if ( have_posts() ) : ?>
 
-			<?php
-				/**
-				 * woocommerce_before_shop_loop hook
-				 *
-				 * @hooked woocommerce_result_count - 20
-				 * @hooked woocommerce_catalog_ordering - 30
-				 */
-				do_action( 'woocommerce_before_shop_loop' );
-			?>
+			<?php do_action('woocommerce_before_shop_loop'); ?>
 
-			<?php woocommerce_product_loop_start(); ?>
+			<ul class="products">
 
 				<?php woocommerce_product_subcategories(); ?>
 
@@ -49,22 +61,31 @@ get_header('shop'); ?>
 
 				<?php endwhile; // end of the loop. ?>
 
-			<?php woocommerce_product_loop_end(); ?>
+			</ul>
 
-			<?php
-				/**
-				 * woocommerce_after_shop_loop hook
-				 *
-				 * @hooked woocommerce_pagination - 10
-				 */
-				do_action( 'woocommerce_after_shop_loop' );
-			?>
+			<?php do_action('woocommerce_after_shop_loop'); ?>
 
-		<?php elseif ( ! woocommerce_product_subcategories( array( 'before' => woocommerce_product_loop_start( false ), 'after' => woocommerce_product_loop_end( false ) ) ) ) : ?>
+		<?php else : ?>
 
-			<?php woocommerce_get_template( 'loop/no-products-found.php' ); ?>
+			<?php if ( ! woocommerce_product_subcategories( array( 'before' => '<ul class="products">', 'after' => '</ul>' ) ) ) : ?>
+
+				<p><?php _e( 'No products found which match your selection.', 'woocommerce' ); ?></p>
+
+			<?php endif; ?>
 
 		<?php endif; ?>
+
+		<div class="clear"></div>
+
+		<?php
+			/**
+			 * woocommerce_pagination hook
+			 *
+			 * @hooked woocommerce_pagination - 10
+			 * @hooked woocommerce_catalog_ordering - 20
+			 */
+			do_action( 'woocommerce_pagination' );
+		?>
 
 	<?php
 		/**

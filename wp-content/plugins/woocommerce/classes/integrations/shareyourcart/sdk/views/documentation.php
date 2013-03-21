@@ -1,4 +1,3 @@
-<?php if(!class_exists('ShareYourCartBase',false)) die('Access Denied'); ?>
 <?php if(!$this->isActive()) return; //if the plugin is not active, do not show this page ?>
 <script type="text/javascript">
   if(_gaq) _gaq.push(['_trackPageview', '/admin/documentation']);
@@ -10,7 +9,7 @@
 	
     <h2>
         <a href="http://www.shareyourcart.com" target="_blank" title="Shareyourcart" class="shareyourcart-logo" onclick=" if(_gaq) _gaq.push(['_trackPageview', '/admin/documentation/logo-click']);">
-            <img src="<?php echo $this->getUrl(dirname(__FILE__).'/../img/shareyourcart-logo.png'); ?>"/>
+            <img src="<?php echo $this->createUrl(dirname(__FILE__).'/../img/shareyourcart-logo.png'); ?>"/>
         </a>
 		<div class="syc-slogan"><?php echo SyC::t('sdk','Increase your social media exposure by 10%!'); ?></div>
 		<br clear="all" /> 
@@ -45,12 +44,12 @@
   </head>
   ...
 </html>'))); ?></code></pre></li>
-		<li><?php echo SyC::t('sdk','This plugin allows you to easily set the above meta properties directly in the post or page edit form'); ?></li>
+		<li><?php echo SyC::t('sdk','This plugin allows you to easilly set the above meta properties directly in the post or page edit form'); ?></li>
 <?php endif; ?>
 
 		<li><p><?php echo SyC::t('sdk','To position the {brand} button, you need to override the following CSS classes', array('{brand}' => '<a href="http://www.shareyourcart.com" target="_blank" title="Shareyourcart&trade;" onclick=" if(_gaq) _gaq.push([\'_trackPageview\', \'/admin/documentation/logo-click\']);">ShareYourCart&trade;</a>')); ?></p>
                     <ul>
-			<li><?php echo SyC::t('sdk','{css_class} for the horizontal button', array('{css_class}' => '<code>button_iframe-normal</code>')); ?></li>
+			<li><?php echo SyC::t('sdk','{css_class} for the horrizontal button', array('{css_class}' => '<code>button_iframe-normal</code>')); ?></li>
 			<li><?php echo SyC::t('sdk','{css_class} for the vertical button', array('{css_class}' => '<code>button_iframe</code>')); ?></li>
                     </ul>
                 </li>

@@ -645,6 +645,15 @@ function add_my_currency_symbol( $currency_symbol, $currency ) {
      return $currency_symbol;
 }
 
+//
+function remove_loop_button(){
+  remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10 );
+  remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+}
+add_action('init','remove_loop_button');
+
+//
+
 // Make theme options variables available for use
 function load_theme_vars() {
 	global $options;

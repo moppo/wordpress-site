@@ -17,27 +17,19 @@ jQuery(document).ready(function($) {
 		var country 		= $('#billing_country').val();
 		var state 			= $('#billing_state').val();
 		var postcode 		= $('input#billing_postcode').val();
-		var city	 		= $('input#billing_city').val();
-		var address	 		= $('input#billing_address_1').val();
-		var address_2	 	= $('input#billing_address_2').val();
 
-		if ( $('#shiptobilling input').is(':checked') || $('#shiptobilling input').size() == 0 ) {
+		if ($('#shiptobilling input').is(':checked') || $('#shiptobilling input').size()==0) {
 			var s_country 	= country;
 			var s_state 	= state;
 			var s_postcode 	= postcode;
-			var s_city 		= city;
-			var s_address 	= address;
-			var s_address_2	= address_2;
+
 		} else {
 			var s_country 	= $('#shipping_country').val();
 			var s_state 	= $('#shipping_state').val();
 			var s_postcode 	= $('input#shipping_postcode').val();
-			var s_city 		= $('input#shipping_city').val();
-			var s_address 	= $('input#shipping_address_1').val();
-			var s_address_2	= $('input#shipping_address_2').val();
 		}
 
-		$('#order_methods, #order_review').block({message: null, overlayCSS: {background: '#fff url(' + woocommerce_params.ajax_loader_url + ') no-repeat center', backgroundSize: '16px 16px', opacity: 0.6}});
+		$('#order_methods, #order_review').block({message: null, overlayCSS: {background: '#fff url(' + woocommerce_params.ajax_loader_url + ') no-repeat center', opacity: 0.6}});
 
 		var data = {
 			action: 			'woocommerce_update_order_review',
@@ -47,15 +39,9 @@ jQuery(document).ready(function($) {
 			country: 			country,
 			state: 				state,
 			postcode: 			postcode,
-			city:				city,
-			address:			address,
-			address_2:			address_2,
 			s_country: 			s_country,
 			s_state: 			s_state,
 			s_postcode: 		s_postcode,
-			s_city:				s_city,
-			s_address:			s_address,
-			s_address_2:		s_address_2,
 			post_data:			$('form.checkout').serialize()
 		};
 
@@ -64,11 +50,9 @@ jQuery(document).ready(function($) {
 			url: 		woocommerce_params.ajax_url,
 			data: 		data,
 			success: 	function( response ) {
-				if ( response ) {
-					var order_output = $(response);
-					$('#order_review').html(order_output.html());
-					$('body').trigger('updated_checkout');
-				}
+				$('#order_review').after(response).remove();
+				$('#order_review input[name=payment_method]:checked').click();
+				$('body').trigger('updated_checkout');
 			}
 		});
 
@@ -93,7 +77,6 @@ jQuery(document).ready(function($) {
 
 	$('a.showcoupon').click(function(){
 		$('.checkout_coupon').slideToggle();
-		$('#coupon_code').focus();
 		return false;
 	});
 
@@ -104,7 +87,7 @@ jQuery(document).ready(function($) {
 		}
 	}).change();
 
-	if ( woocommerce_params.option_guest_checkout == 'yes' ) {
+	if (woocommerce_params.option_guest_checkout=='yes') {
 
 		$('div.create-account').hide();
 
@@ -117,115 +100,82 @@ jQuery(document).ready(function($) {
 
 	}
 
-	// Used for input change events below
-	function input_changed() {
-		var update_totals = true;
-
-		if ( $(dirtyInput).size() ) {
-
-			$required_siblings = $(dirtyInput).closest('.form-row').siblings('.address-field.validate-required');
-
-			if ( $required_siblings.size() ) {
-				 $required_siblings.each(function(){
-					if ( $(this).find('input.input-text').val() == '' || $(this).find('input.input-text').val() == 'undefined' ) {
-						update_totals = false;
-					}
-				 });
-			}
-
+	$('.payment_methods input.input-radio').live('click', function(){
+		$('div.payment_box').filter(':visible').slideUp(250);
+		if ($(this).is(':checked')) {
+			$('div.payment_box.' + $(this).attr('ID')).slideDown(250);
 		}
+	});
 
-		if ( update_totals ) {
-			dirtyInput = false;
-			$('body').trigger('update_checkout');
-		}
-	}
+	$('#order_review input[name=payment_method]:checked').click();
 
-	$('#order_review')
-
-	/* Payment option selection */
-
-	.on( 'click', '.payment_methods input.input-radio', function() {
-		if ( $('.payment_methods input.input-radio').length > 1 ) {
-			$('div.payment_box').filter(':visible').slideUp(250);
-			if ($(this).is(':checked')) {
-				$('div.payment_box.' + $(this).attr('ID')).slideDown(250);
-			}
-		} else {
-			$('div.payment_box').show();
-		}
-	})
-
-	// Trigger initial click
-	.find('input[name=payment_method]:checked').click();
-
-	$('form.checkout')
-
-	/* Update totals/taxes/shipping */
-
+	/* Update totals */
 	// Inputs/selects which update totals instantly
-	.on( 'change', 'select#shipping_method, input[name=shipping_method], #shiptobilling input, .update_totals_on_change select', function(){
+	$('select#shipping_method, input[name=shipping_method], #shiptobilling input, .update_totals_on_change select').live('change', function(){
 		clearTimeout( updateTimer );
+		$('body').trigger('update_checkout');
+	});
+
+	// Inputs which update totals on change
+	function input_changed() {
 		dirtyInput = false;
 		$('body').trigger('update_checkout');
-	})
-
-	// Address-fields which refresh totals when all required fields are filled
-	.on( 'change', '.address-field input.input-text', function() {
+	}
+	$('.update_totals_on_change input').live('change', function(){
 		if ( dirtyInput ) {
-			input_changed();
+			clearTimeout( updateTimer );
+			$('body').trigger('update_checkout');
 		}
-	})
-
-	.on( 'change', '.address-field select', function() {
-		dirtyInput = this;
-		input_changed();
-	})
-
-	.on( 'keydown', '.address-field input.input-text', function( e ){
+	});
+	$('.update_totals_on_change input').live('keydown', function( e ){
 		var code = e.keyCode || e.which;
 		if ( code == '9' )
 			return;
-		dirtyInput = this;
+		dirtyInput = true;
 		clearTimeout( updateTimer );
 		updateTimer = setTimeout( input_changed, '1000' );
-	})
+	});
 
-	/* Inline validation */
+	// Update on page load
+	if ( woocommerce_params.is_checkout == 1 )
+		$('body').trigger('update_checkout');
 
-	.on( 'blur change', '.input-text, select', function() {
-		var $this = $(this);
-		var $parent = $this.closest('.form-row');
-		var validated = true;
+	/* AJAX Coupon Form Submission */
+	$('form.checkout_coupon').submit( function() {
+		var $form = $(this);
 
-		if ( $parent.is( '.validate-required' ) ) {
-			if ( $this.val() == '' ) {
-				$parent.removeClass( 'woocommerce-validated' ).addClass( 'woocommerce-invalid woocommerce-invalid-required-field' );
-				validated = false;
-			}
-		}
+		if ( $form.is('.processing') ) return false;
 
-		if ( $parent.is( '.validate-email' ) ) {
-			if ( $this.val() ) {
+		$form.addClass('processing').block({message: null, overlayCSS: {background: '#fff url(' + woocommerce_params.ajax_loader_url + ') no-repeat center', opacity: 0.6}});
 
-				/* http://stackoverflow.com/questions/2855865/jquery-validate-e-mail-address-regex */
-				var pattern = new RegExp(/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i);
+		var data = {
+			action: 			'woocommerce_apply_coupon',
+			security: 			woocommerce_params.apply_coupon_nonce,
+			coupon_code:		$form.find('input[name=coupon_code]').val()
+		};
 
-				if ( ! pattern.test( $this.val()  ) ) {
-					$parent.removeClass( 'woocommerce-validated' ).addClass( 'woocommerce-invalid woocommerce-invalid-email' );
-					validated = false;
+		$.ajax({
+			type: 		'POST',
+			url: 		woocommerce_params.ajax_url,
+			data: 		data,
+			success: 	function( code ) {
+				$('.woocommerce_error, .woocommerce_message').remove();
+				$form.removeClass('processing').unblock();
+
+				if ( code ) {
+					$form.before( code );
+					$form.slideUp();
+
+					$('body').trigger('update_checkout');
 				}
-			}
-		}
-
-		if ( validated ) {
-			$parent.removeClass( 'woocommerce-invalid woocommerce-invalid-required-field' ).addClass( 'woocommerce-validated' );
-		}
-	} )
+			},
+			dataType: 	"html"
+		});
+		return false;
+	});
 
 	/* AJAX Form Submission */
-
-	.submit( function() {
+	$('form.checkout').submit( function() {
 		clearTimeout( updateTimer );
 
 		var $form = $(this);
@@ -241,7 +191,7 @@ jQuery(document).ready(function($) {
 			var form_data = $form.data();
 
 			if ( form_data["blockUI.isBlocked"] != 1 )
-				$form.block({message: null, overlayCSS: {background: '#fff url(' + woocommerce_params.ajax_loader_url + ') no-repeat center', backgroundSize: '16px 16px', opacity: 0.6}});
+				$form.block({message: null, overlayCSS: {background: '#fff url(' + woocommerce_params.ajax_loader_url + ') no-repeat center', opacity: 0.6}});
 
 			$.ajax({
 				type: 		'POST',
@@ -249,12 +199,8 @@ jQuery(document).ready(function($) {
 				data: 		$form.serialize(),
 				success: 	function( code ) {
 						try {
-							// Get the valid JSON only from the returned string
-							if ( code.indexOf("<!--WC_START-->") >= 0 )
-								code = code.split("<!--WC_START-->")[1]; // Strip off before after WC_START
-
-							if ( code.indexOf("<!--WC_END-->") >= 0 )
-								code = code.split("<!--WC_END-->")[0]; // Strip off anything after WC_END
+							// Get the valid JSON only
+							var code = code.split("<!--WC_END-->")[0];
 
 							// Parse
 							var result = $.parseJSON( code );
@@ -265,10 +211,9 @@ jQuery(document).ready(function($) {
 
 							} else if (result.result=='failure') {
 
-								$('.woocommerce-error, .woocommerce-message').remove();
+								$('.woocommerce_error, .woocommerce_message').remove();
 								$form.prepend( result.messages );
 								$form.removeClass('processing').unblock();
-								$form.find( '.input-text, select' ).blur();
 
 								if (result.refresh=='true') $('body').trigger('update_checkout');
 
@@ -281,10 +226,9 @@ jQuery(document).ready(function($) {
 							}
 						}
 						catch(err) {
-							$('.woocommerce-error, .woocommerce-message').remove();
+							$('.woocommerce_error, .woocommerce_message').remove();
 						  	$form.prepend( code );
 							$form.removeClass('processing').unblock();
-							$form.find( '.input-text, select' ).blur();
 
 							$('html, body').animate({
 							    scrollTop: ($('form.checkout').offset().top - 100)
@@ -299,49 +243,13 @@ jQuery(document).ready(function($) {
 		return false;
 	});
 
-	/* AJAX Coupon Form Submission */
-	$('form.checkout_coupon').submit( function() {
-		var $form = $(this);
-
-		if ( $form.is('.processing') ) return false;
-
-		$form.addClass('processing').block({message: null, overlayCSS: {background: '#fff url(' + woocommerce_params.ajax_loader_url + ') no-repeat center', backgroundSize: '16px 16px', opacity: 0.6}});
-
-		var data = {
-			action: 			'woocommerce_apply_coupon',
-			security: 			woocommerce_params.apply_coupon_nonce,
-			coupon_code:		$form.find('input[name=coupon_code]').val()
-		};
-
-		$.ajax({
-			type: 		'POST',
-			url: 		woocommerce_params.ajax_url,
-			data: 		data,
-			success: 	function( code ) {
-				$('.woocommerce-error, .woocommerce-message').remove();
-				$form.removeClass('processing').unblock();
-
-				if ( code ) {
-					$form.before( code );
-					$form.slideUp();
-
-					$('body').trigger('update_checkout');
-				}
-			},
-			dataType: 	"html"
-		});
-		return false;
-	});
-
 	/* Localisation */
 	var locale_json = woocommerce_params.locale.replace(/&quot;/g, '"');
 	var locale = $.parseJSON( locale_json );
-	var required = ' <abbr class="required" title="' + woocommerce_params.i18n_required_text + '">*</abbr>';
-
-	$('body')
+	var required = ' <abbr class="required" title="' + woocommerce_params.required_text + '">*</abbr>';
 
 	// Handle locale
-	.bind('country_to_state_changing', function( event, country, wrapper ){
+	$('body').bind('country_to_state_changing', function( event, country, wrapper ){
 
 		var thisform = wrapper;
 
@@ -376,17 +284,15 @@ jQuery(document).ready(function($) {
 
 				field.find('label abbr').remove();
 
-				if ( typeof thislocale[key]['required'] == 'undefined' && locale['default'][key]['required'] == true ) {
-					field.find('label').append( required );
-				} else if ( thislocale[key]['required'] == true ) {
+				if ( typeof thislocale[key]['required'] == 'undefined' || thislocale[key]['required'] == true ) {
 					field.find('label').append( required );
 				}
 
 				if ( key !== 'state' ) {
 					if ( thislocale[key]['hidden'] == true ) {
-						field.hide().find('input').val('');
+						field.fadeOut(200).find('input').val('');
 					} else {
-						field.show();
+						field.fadeIn(500);
 					}
 				}
 
@@ -395,46 +301,36 @@ jQuery(document).ready(function($) {
 					if (field.find('label abbr').size()==0) field.find('label').append( required );
 				}
 				if ( key !== 'state' && (typeof locale['default'][key]['hidden'] == 'undefined' || locale['default'][key]['hidden'] == false) ) {
-					field.show();
+					field.fadeIn(500);
 				}
 			}
 
 		});
 
-		var $postcodefield = thisform.find('#billing_postcode_field, #shipping_postcode_field');
-		var $cityfield     = thisform.find('#billing_city_field, #shipping_city_field');
-		var $statefield    = thisform.find('#billing_state_field, #shipping_state_field');
-
-		if ( ! $postcodefield.attr('data-o_class') ) {
-			$postcodefield.attr('data-o_class', $postcodefield.attr('class'));
-			$cityfield.attr('data-o_class', $cityfield.attr('class'));
-			$statefield.attr('data-o_class', $statefield.attr('class'));
-		}
+		var postcodefield = thisform.find('#billing_postcode_field, #shipping_postcode_field');
+		var cityfield = thisform.find('#billing_city_field, #shipping_city_field');
 
 		// Re-order postcode/city
 		if ( thislocale['postcode_before_city'] ) {
-
-			$postcodefield.add( $cityfield ).add( $statefield ).removeClass('form-row-first form-row-last').addClass('form-row-wide');
-			$postcodefield.insertBefore( $cityfield );
-
+			if (cityfield.is('.form-row-first')) {
+				cityfield.fadeOut(200, function() {
+					cityfield.removeClass('form-row-first').addClass('form-row-last').insertAfter( postcodefield ).fadeIn(500);
+				});
+				postcodefield.fadeOut(200, function (){
+					postcodefield.removeClass('form-row-last').addClass('form-row-first').fadeIn(500);
+				});
+			}
 		} else {
-			// Default
-			$postcodefield.attr('class', $postcodefield.attr('data-o_class'));
-			$cityfield.attr('class', $cityfield.attr('data-o_class'));
-			$statefield.attr('class', $statefield.attr('data-o_class'));
-			$postcodefield.insertAfter( $statefield );
+			if (cityfield.is('.form-row-last')) {
+				cityfield.fadeOut(200, function() {
+					cityfield.removeClass('form-row-last').addClass('form-row-first').insertBefore( postcodefield ).fadeIn(500);
+				});
+				postcodefield.fadeOut(200, function (){
+					postcodefield.removeClass('form-row-first').addClass('form-row-last').fadeIn(500);
+				});
+			}
 		}
 
-	})
-
-	// Init trigger
-	.bind('init_checkout', function() {
-		$('#billing_country, #shipping_country, .country_to_state').change();
-		$('body').trigger('update_checkout');
 	});
-
-	// Update on page load
-	if ( woocommerce_params.is_checkout == 1 )
-		$('body').trigger('init_checkout');
 
 });

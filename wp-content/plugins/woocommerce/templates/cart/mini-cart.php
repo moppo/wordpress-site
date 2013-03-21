@@ -9,13 +9,8 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 global $woocommerce;
 ?>
-
-<?php do_action( 'woocommerce_before_mini_cart' ); ?>
-
 <ul class="cart_list product_list_widget <?php echo $args['list_class']; ?>">
 
 	<?php if ( sizeof( $woocommerce->cart->get_cart() ) > 0 ) : ?>
@@ -29,7 +24,7 @@ global $woocommerce;
 				continue;
 
 			// Get price
-			$product_price = get_option( 'woocommerce_tax_display_cart' ) == 'excl' ? $_product->get_price_excluding_tax() : $_product->get_price_including_tax();
+			$product_price = get_option( 'woocommerce_display_cart_prices_excluding_tax' ) == 'yes' || $woocommerce->customer->is_vat_exempt() ? $_product->get_price_excluding_tax() : $_product->get_price();
 
 			$product_price = apply_filters( 'woocommerce_cart_item_price_html', woocommerce_price( $product_price ), $cart_item, $cart_item_key );
 			?>
@@ -45,14 +40,14 @@ global $woocommerce;
 
 				<?php echo $woocommerce->cart->get_item_data( $cart_item ); ?>
 
-				<?php echo apply_filters( 'woocommerce_widget_cart_item_quantity', '<span class="quantity">' . sprintf( '%s &times; %s', $cart_item['quantity'], $product_price ) . '</span>', $cart_item, $cart_item_key ); ?>
+				<span class="quantity"><?php printf( '%s &times; %s', $cart_item['quantity'], $product_price ); ?></span>
 			</li>
 
 		<?php endforeach; ?>
 
 	<?php else : ?>
 
-		<li class="empty"><?php _e( 'No products in the cart.', 'woocommerce' ); ?></li>
+		<li class="empty"><?php _e('No products in the cart.', 'woocommerce'); ?></li>
 
 	<?php endif; ?>
 
@@ -60,15 +55,13 @@ global $woocommerce;
 
 <?php if ( sizeof( $woocommerce->cart->get_cart() ) > 0 ) : ?>
 
-	<p class="total"><strong><?php _e( 'Subtotal', 'woocommerce' ); ?>:</strong> <?php echo $woocommerce->cart->get_cart_subtotal(); ?></p>
+	<p class="total"><strong><?php _e('Subtotal', 'woocommerce'); ?>:</strong> <?php echo $woocommerce->cart->get_cart_subtotal(); ?></p>
 
 	<?php do_action( 'woocommerce_widget_shopping_cart_before_buttons' ); ?>
 
 	<p class="buttons">
-		<a href="<?php echo $woocommerce->cart->get_cart_url(); ?>" class="button"><?php _e( 'View Cart &rarr;', 'woocommerce' ); ?></a>
-		<a href="<?php echo $woocommerce->cart->get_checkout_url(); ?>" class="button checkout"><?php _e( 'Checkout &rarr;', 'woocommerce' ); ?></a>
+		<a href="<?php echo $woocommerce->cart->get_cart_url(); ?>" class="button"><?php _e('View Cart &rarr;', 'woocommerce'); ?></a>
+		<a href="<?php echo $woocommerce->cart->get_checkout_url(); ?>" class="button checkout"><?php _e('Checkout &rarr;', 'woocommerce'); ?></a>
 	</p>
 
 <?php endif; ?>
-
-<?php do_action( 'woocommerce_after_mini_cart' ); ?>

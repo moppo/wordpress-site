@@ -7,8 +7,6 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 global $woocommerce, $product;
 
 // Put grouped products into an array
@@ -36,13 +34,17 @@ foreach ( $product->get_children() as $child_id ) {
 			<?php foreach ( $grouped_products as $child_product ) : ?>
 				<tr>
 					<td>
-						<?php if ( $child_product['product']->is_type('external') ) : ?>
+						<?php if ( $child_product['product']->is_type('external') ) :
 
-							<a href="<?php echo esc_url( $child_product['product']->get_product_url() ); ?>" rel="nofollow" class="button alt"><?php echo apply_filters('single_add_to_cart_text', esc_html( $child_product['product']->get_button_text() ), 'external'); ?></a>
+							$product_url = get_post_meta( $child_product['product']->id, '_product_url', true );
+							$button_text = get_post_meta( $child_product['product']->id, '_button_text', true );
+							?>
+
+							<a href="<?php echo $product_url; ?>" rel="nofollow" class="button alt"><?php echo apply_filters('single_add_to_cart_text', $button_text, 'external'); ?></a>
 
 						<?php elseif ( ! $quantites_required ) : ?>
 
-							<a href="<?php echo esc_url( $child_product['product']->add_to_cart_url() ); ?>" rel="nofollow" class="single_add_to_cart_button button alt"><?php echo apply_filters( 'single_add_to_cart_text', __( 'Add to cart', 'woocommerce' ), $child_product['product']->product_type ); ?></a>
+							<button type="submit" name="quantity[<?php echo $child_product['product']->id; ?>]" value="1" class="single_add_to_cart_button button alt"><?php _e('Add to cart', 'woocommerce'); ?></button>
 
 						<?php else : ?>
 
@@ -54,13 +56,11 @@ foreach ( $product->get_children() as $child_id ) {
 					<td class="label"><label for="product-<?php echo $child_product['product']->id; ?>"><?php
 
 						if ($child_product['product']->is_visible())
-							echo '<a href="' . get_permalink( $child_product['product']->id ) . '">' . $child_product['product']->post->post_title . '</a>';
+							echo '<a href="'.get_permalink($child_product['product']->id).'">' . $child_product['product']->get_title() . '</a>';
 						else
-							echo $child_product['product']->post->post_title;
+							echo $child_product['product']->get_title();
 
 					?></label></td>
-
-					<?php do_action ( 'woocommerce_grouped_product_list_before_price', $child_product['product'] ); ?>
 
 					<td class="price"><?php echo $child_product['product']->get_price_html(); ?>
 					<?php echo apply_filters( 'woocommerce_stock_html', '<small class="stock '.$child_product['availability']['class'].'">'.$child_product['availability']['availability'].'</small>', $child_product['availability']['availability'] ); ?>
@@ -74,7 +74,7 @@ foreach ( $product->get_children() as $child_id ) {
 
 		<?php do_action('woocommerce_before_add_to_cart_button'); ?>
 
-		<button type="submit" class="single_add_to_cart_button button alt"><?php echo apply_filters('single_add_to_cart_text', __( 'Add to cart', 'woocommerce' ), $product->product_type); ?></button>
+		<button type="submit" class="single_add_to_cart_button button alt"><?php echo apply_filters('single_add_to_cart_text', __('Add to cart', 'woocommerce'), $product->product_type); ?></button>
 
 		<?php do_action('woocommerce_after_add_to_cart_button'); ?>
 

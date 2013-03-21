@@ -11,8 +11,6 @@
  * @version     1.6.4
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
 /** Store settings in this array */
 global $woocommerce_settings;
 
@@ -30,13 +28,11 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 	 * @return void
 	 */
 	function woocommerce_settings() {
-	    global $woocommerce, $woocommerce_settings, $current_section, $current_tab;
-
-	    do_action( 'woocommerce_settings_start' );
+	    global $woocommerce, $woocommerce_settings;
 
 	    // Get current tab/section
-	    $current_tab 		= ( empty( $_GET['tab'] ) ) ? 'general' : sanitize_text_field( urldecode( $_GET['tab'] ) );
-	    $current_section 	= ( empty( $_REQUEST['section'] ) ) ? '' : sanitize_text_field( urldecode( $_REQUEST['section'] ) );
+	    $current_tab 		= ( empty( $_GET['tab'] ) ) ? 'general' : urldecode( $_GET['tab'] );
+	    $current_section 	= ( empty( $_REQUEST['section'] ) ) ? '' : urldecode( $_REQUEST['section'] );
 
 	    // Save settings
 	    if ( ! empty( $_POST ) ) {
@@ -52,24 +48,19 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 	    	 	include_once( 'settings/settings-save.php' );
 
 		    	switch ( $current_tab ) {
-					case "payment_gateways" :
-						woocommerce_update_options( $woocommerce_settings[ $current_tab ] );
-						$woocommerce->payment_gateways->process_admin_options();
-					break;
+					case "general" :
+					case "pages" :
+					case "catalog" :
+					case "inventory" :
 					case "shipping" :
-						woocommerce_update_options( $woocommerce_settings[ $current_tab ] );
-						$woocommerce->shipping->process_admin_options();
-					break;
-					default :
-						if ( isset( $woocommerce_settings[ $current_tab ] ) )
-							woocommerce_update_options( $woocommerce_settings[ $current_tab ] );
-
-						// Trigger action for tab
-						do_action( 'woocommerce_update_options_' . $current_tab );
+					case "tax" :
+					case "email" :
+						woocommerce_update_options( $woocommerce_settings[$current_tab] );
 					break;
 				}
 
 				do_action( 'woocommerce_update_options' );
+				do_action( 'woocommerce_update_options_' . $current_tab );
 
 				// Handle Colour Settings
 				if ( $current_tab == 'general' && get_option('woocommerce_frontend_css') == 'yes' ) {
@@ -82,11 +73,11 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 					$subtext 		= ( ! empty( $_POST['woocommerce_frontend_css_subtext'] ) ) ? woocommerce_format_hex( $_POST['woocommerce_frontend_css_subtext'] ) : '';
 
 					$colors = array(
-						'primary' 		=> $primary,
-						'secondary' 	=> $secondary,
-						'highlight' 	=> $highlight,
-						'content_bg' 	=> $content_bg,
-						'subtext' 		=> $subtext
+						'primary' 	=> $primary,
+						'secondary' => $secondary,
+						'highlight' => $highlight,
+						'content_bg' => $content_bg,
+						'subtext' => $subtext
 					);
 
 					$old_colors = get_option( 'woocommerce_frontend_css_colors' );
@@ -94,36 +85,15 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 
 					if ( $old_colors != $colors )
 						woocommerce_compile_less_styles();
+
 				}
 
 			} else {
 
 				// If saving a shipping methods options, load 'er up
-				if ( ( $current_tab == 'shipping' || $current_tab == 'payment_gateways' && class_exists( $current_section ) ) ) {
-
+				if ( $current_tab == 'shipping' && class_exists( $current_section ) ) {
 					$current_section_class = new $current_section();
 					do_action( 'woocommerce_update_options_' . $current_tab . '_' . $current_section_class->id );
-
-				// If saving an email's options, load theme
-				} elseif ( $current_tab == 'email' ) {
-
-					// Load mailer
-					$mailer = $woocommerce->mailer();
-
-					if ( class_exists( $current_section ) ) {
-						$current_section_class = new $current_section();
-						do_action( 'woocommerce_update_options_' . $current_tab . '_' . $current_section_class->id );
-					} else {
-						do_action( 'woocommerce_update_options_' . $current_tab . '_' . $current_section );
-					}
-
-				// Save tax
-				} elseif ( $current_tab == 'tax' ) {
-
-					include_once('settings/settings-tax-rates.php');
-
-					woocommerce_tax_rates_setting_save();
-
 				} else {
 
 					// Save section only
@@ -133,7 +103,9 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 
 			}
 
-			// Clear any unwanted data
+			// Flush rules and clear any unwanted data
+			flush_rewrite_rules( false );
+			unset($_SESSION['orderby']);
 			$woocommerce->clear_product_transients();
 
 			// Redirect back to the settings page
@@ -141,7 +113,7 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 
 			if ( ! empty( $_POST['subtab'] ) ) $redirect = add_query_arg( 'subtab', esc_attr( str_replace( '#', '', $_POST['subtab'] ) ), $redirect );
 
-			wp_safe_redirect( $redirect );
+			wp_redirect( $redirect );
 			exit;
 		}
 
@@ -152,9 +124,9 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 		if ( $error || $message ) {
 
 			if ( $error ) {
-				echo '<div id="message" class="error fade"><p><strong>' . esc_html( $error ) . '</strong></p></div>';
+				echo '<div id="message" class="error fade"><p><strong>' . wptexturize( $error ) . '</strong></p></div>';
 			} else {
-				echo '<div id="message" class="updated fade"><p><strong>' . esc_html( $message ) . '</strong></p></div>';
+				echo '<div id="message" class="updated fade"><p><strong>' . wptexturize( $message ) . '</strong></p></div>';
 			}
 
 		} elseif ( ! empty( $_GET['saved'] ) ) {
@@ -165,12 +137,50 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 
 	    // Were the settings saved?
 	    if ( ! empty( $_GET['saved'] ) ) {
+	        flush_rewrite_rules( false );
 	        do_action('woocommerce_settings_saved');
 	    }
 
 	    // Hide WC Link
-	    if ( ! empty( $_GET['hide-wc-extensions-message'] ) )
-	    	update_option( 'hide-wc-extensions-message', 1 );
+	    if (isset($_GET['hide-wc-extensions-message']))
+	    	update_option('hide-wc-extensions-message', 1);
+
+	    // Install/page installer
+	    $install_complete = false;
+
+	    // Add pages button
+	    if (isset($_GET['install_woocommerce_pages']) && $_GET['install_woocommerce_pages']) {
+
+			require_once( 'woocommerce-admin-install.php' );
+	    	woocommerce_create_pages();
+	    	update_option('skip_install_woocommerce_pages', 1);
+	    	$install_complete = true;
+
+		// Skip button
+	    } elseif (isset($_GET['skip_install_woocommerce_pages']) && $_GET['skip_install_woocommerce_pages']) {
+
+	    	update_option('skip_install_woocommerce_pages', 1);
+	    	$install_complete = true;
+
+	    }
+
+		if ($install_complete) {
+			?>
+	    	<div id="message" class="updated woocommerce-message wc-connect">
+				<div class="squeezer">
+					<h4><?php _e( '<strong>Congratulations!</strong> &#8211; WooCommerce has been installed and setup. Enjoy :)', 'woocommerce' ); ?></h4>
+					<p><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.woothemes.com/woocommerce/" data-text="A open-source (free) #ecommerce plugin for #WordPress that helps you sell anything. Beautifully." data-via="WooThemes" data-size="large" data-hashtags="WooCommerce">Tweet</a>
+		<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script></p>
+				</div>
+			</div>
+			<?php
+
+			// Flush rules after install
+			flush_rewrite_rules( false );
+
+			// Set installed option
+			update_option('woocommerce_installed', 0);
+		}
 	    ?>
 		<div class="wrap woocommerce">
 			<form method="post" id="mainform" action="" enctype="multipart/form-data">
@@ -188,9 +198,6 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 							'integration' => __( 'Integration', 'woocommerce' )
 						);
 
-						if ( ! $woocommerce->integrations->get_integrations() )
-							unset( $tabs['integration'] );
-
 						$tabs = apply_filters('woocommerce_settings_tabs_array', $tabs);
 
 						foreach ( $tabs as $name => $label ) {
@@ -205,7 +212,7 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 				<?php wp_nonce_field( 'woocommerce-settings', '_wpnonce', true, true ); ?>
 
 				<?php if ( ! get_option('hide-wc-extensions-message') ) : ?>
-					<div id="woocommerce_extensions"><a href="<?php echo add_query_arg('hide-wc-extensions-message', 'true') ?>" class="hide">&times;</a><?php printf(__( 'More functionality and gateway options available via <a href="%s" target="_blank">WC official extensions</a>.', 'woocommerce' ), 'http://www.woothemes.com/extensions/woocommerce-extensions/'); ?></div>
+					<div id="woocommerce_extensions"><a href="<?php echo add_query_arg('hide-wc-extensions-message', 'true') ?>" class="hide">&times;</a><?php printf(__('More functionality and gateway options available via <a href="%s" target="_blank">WC official extensions</a>.', 'woocommerce'), 'http://www.woothemes.com/extensions/woocommerce-extensions/'); ?></div>
 				<?php endif; ?>
 
 				<?php
@@ -215,71 +222,14 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 							woocommerce_admin_fields( $woocommerce_settings[$current_tab] );
 						break;
 						case "tax" :
-
-							$links = array(
-								'<a href="' . admin_url( 'admin.php?page=woocommerce_settings&tab=tax' ) . '" class="' . ( $current_section == '' ? 'current' : '' ) . '">' . __( 'Tax Options', 'woocommerce' ) . '</a>'
-							);
-
-							// Get tax classes and display as links
-							$tax_classes = array_filter( array_map( 'trim', explode( "\n", get_option('woocommerce_tax_classes' ) ) ) );
-
-							$links[] = __( 'Tax Rates', 'woocommerce' ) . ': <a href="' . admin_url( 'admin.php?page=woocommerce_settings&tab=tax&section=standard' ) . '" class="' . ( $current_section == 'standard' ? 'current' : '' ) . '">' . __( 'Standard', 'woocommerce' ) . '</a>';
-
-							if ( $tax_classes )
-								foreach ( $tax_classes as $class )
-									$links[] = '<a href="' . admin_url( 'admin.php?page=woocommerce_settings&tab=tax&section=' . sanitize_title( $class ) ) . '" class="' . ( $current_section == sanitize_title( $class ) ? 'current' : '' ) . '">' . $class  . '</a>';
-
-							echo '<ul class="subsubsub"><li>' . implode( ' | </li><li>', $links ) . '</li></ul><br class="clear" />';
-
-							if ( $current_section == 'standard' || in_array( $current_section, array_map( 'sanitize_title', $tax_classes ) ) ) {
-
-								include_once('settings/settings-tax-rates.php');
-
-								woocommerce_tax_rates_setting();
-
-							} else {
-								woocommerce_admin_fields( $woocommerce_settings[ $current_tab ] );
-							}
+							include('settings/settings-tax-rates.php');
+							woocommerce_admin_fields( $woocommerce_settings[$current_tab] );
 						break;
 						case "pages" :
 						case "catalog" :
 						case "inventory" :
-							woocommerce_admin_fields( $woocommerce_settings[$current_tab] );
-						break;
 						case "email" :
-
-							$current = $current_section ? '' : 'class="current"';
-
-							$links = array( '<a href="' . admin_url( 'admin.php?page=woocommerce_settings&tab=email' ) . '" ' . $current . '>' . __( 'Email Options', 'woocommerce' ) . '</a>' );
-
-							// Define emails that can be customised here
-							$mailer 			= $woocommerce->mailer();
-							$email_templates 	= $mailer->get_emails();
-
-							foreach ( $email_templates as $email ) {
-
-								$title = empty( $email->title ) ? ucwords( $email->id ) : ucwords( $email->title );
-
-								$current = ( get_class( $email ) == $current_section ) ? 'class="current"' : '';
-
-								$links[] = '<a href="' . add_query_arg( 'section', get_class( $email ), admin_url('admin.php?page=woocommerce_settings&tab=email') ) . '"' . $current . '>' . esc_html( $title ) . '</a>';
-
-							}
-
-							echo '<ul class="subsubsub"><li>' . implode( ' | </li><li>', $links ) . '</li></ul><br class="clear" />';
-
-							// Specific email options
-							if ( $current_section ) {
-								foreach ( $email_templates as $email ) {
-									if ( get_class( $email ) == $current_section ) {
-										$email->admin_options();
-										break;
-									}
-								}
-			            	} else {
-			            		woocommerce_admin_fields( $woocommerce_settings[ $current_tab ] );
-			            	}
-
+							woocommerce_admin_fields( $woocommerce_settings[$current_tab] );
 						break;
 						case "shipping" :
 
@@ -287,7 +237,7 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 
 							$current = $current_section ? '' : 'class="current"';
 
-							$links = array( '<a href="' . admin_url('admin.php?page=woocommerce_settings&tab=shipping') . '" ' . $current . '>' . __( 'Shipping Options', 'woocommerce' ) . '</a>' );
+							$links = array( '<a href="' . admin_url('admin.php?page=woocommerce_settings&tab=shipping') . '" ' . $current . '>' . __('Shipping Options', 'woocommerce') . '</a>' );
 
 							// Load shipping methods so we can show any global options they may have
 							$shipping_methods = $woocommerce->shipping->load_shipping_methods();
@@ -300,7 +250,7 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 
 								$current = ( get_class( $method ) == $current_section ) ? 'class="current"' : '';
 
-								$links[] = '<a href="' . add_query_arg( 'section', get_class( $method ), admin_url('admin.php?page=woocommerce_settings&tab=shipping') ) . '"' . $current . '>' . esc_html( $title ) . '</a>';
+								$links[] = '<a href="' . add_query_arg( 'section', get_class( $method ), admin_url('admin.php?page=woocommerce_settings&tab=shipping') ) . '"' . $current . '>' . $title . '</a>';
 
 							}
 
@@ -315,43 +265,37 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 									}
 								}
 			            	} else {
-			            		woocommerce_admin_fields( $woocommerce_settings[ $current_tab ] );
+			            		woocommerce_admin_fields( $woocommerce_settings[$current_tab] );
 			            	}
 
 						break;
 						case "payment_gateways" :
 							include('settings/settings-payment-gateways.php');
 
-							$current = $current_section ? '' : 'class="current"';
+							$links = array( '<a href="#payment-gateways">'.__('Payment Gateways', 'woocommerce').'</a>' );
 
-							$links = array( '<a href="' . admin_url('admin.php?page=woocommerce_settings&tab=payment_gateways') . '" ' . $current . '>' . __( 'Payment Gateways', 'woocommerce' ) . '</a>' );
+			            	foreach ( $woocommerce->payment_gateways->payment_gateways() as $gateway ) :
+			            		$title = empty( $gateway->method_title ) ? ucwords( $gateway->id ) : ucwords( $gateway->method_title );
 
-							// Load shipping methods so we can show any global options they may have
-							$payment_gateways = $woocommerce->payment_gateways->payment_gateways();
+			            		$links[] = '<a href="#gateway-'.$gateway->id.'">'.$title.'</a>';
+							endforeach;
 
-							foreach ( $payment_gateways as $gateway ) {
+							echo '<div class="subsubsub_section"><ul class="subsubsub"><li>' . implode( ' | </li><li>', $links ) . '</li></ul><br class="clear" />';
 
-								$title = empty( $gateway->method_title ) ? ucwords( $gateway->id ) : ucwords( $gateway->method_title );
+							echo '<div class="section" id="payment-gateways">';
 
-								$current = ( get_class( $gateway ) == $current_section ) ? 'class="current"' : '';
+							woocommerce_admin_fields( $woocommerce_settings[$current_tab] );
 
-								$links[] = '<a href="' . add_query_arg( 'section', get_class( $gateway ), admin_url('admin.php?page=woocommerce_settings&tab=payment_gateways') ) . '"' . $current . '>' . esc_html( $title ) . '</a>';
-
-							}
-
-							echo '<ul class="subsubsub"><li>' . implode( ' | </li><li>', $links ) . '</li></ul><br class="clear" />';
+							echo '</div>';
 
 							// Specific method options
-							if ( $current_section ) {
-								foreach ( $payment_gateways as $gateway ) {
-									if ( get_class( $gateway ) == $current_section ) {
-										$gateway->admin_options();
-										break;
-									}
-								}
-			            	} else {
-			            		woocommerce_admin_fields( $woocommerce_settings[ $current_tab ] );
+			            	foreach ( $woocommerce->payment_gateways->payment_gateways() as $gateway ) {
+			            		echo '<div class="section" id="gateway-'.$gateway->id.'">';
+		            			$gateway->admin_options();
+		            			echo '</div>';
 			            	}
+
+							echo '</div>';
 
 						break;
 						case "integration" :
@@ -360,14 +304,12 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 
 							$current_section = empty( $current_section ) ? key( $integrations ) : $current_section;
 
-							$links = array();
-
 							foreach ( $integrations as $integration ) {
 								$title = empty( $integration->method_title ) ? ucwords( $integration->id ) : ucwords( $integration->method_title );
 
 								$current = ( $integration->id == $current_section ) ? 'class="current"' : '';
 
-								$links[] = '<a href="' . add_query_arg( 'section', $integration->id, admin_url('admin.php?page=woocommerce_settings&tab=integration') ) . '"' . $current . '>' . esc_html( $title ) . '</a>';
+								$links[] = '<a href="' . add_query_arg( 'section', $integration->id, admin_url('admin.php?page=woocommerce_settings&tab=integration') ) . '"' . $current . '>' . $title . '</a>';
 							}
 
 							echo '<ul class="subsubsub"><li>' . implode( ' | </li><li>', $links ) . '</li></ul><br class="clear" />';
@@ -382,15 +324,39 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 					endswitch;
 				?>
 		        <p class="submit">
-		        	<?php if ( ! isset( $GLOBALS['hide_save_button'] ) ) : ?>
-		        		<input name="save" class="button-primary" type="submit" value="<?php _e( 'Save changes', 'woocommerce' ); ?>" />
-		        	<?php endif; ?>
+		        	<input name="save" class="button-primary" type="submit" value="<?php _e( 'Save changes', 'woocommerce' ); ?>" />
 		        	<input type="hidden" name="subtab" id="last_tab" />
 		        </p>
 			</form>
 
 			<script type="text/javascript">
 				jQuery(window).load(function(){
+					// Subsubsub tabs
+					jQuery('div.subsubsub_section ul.subsubsub li a:eq(0)').addClass('current');
+					jQuery('div.subsubsub_section .section:gt(0)').hide();
+
+					jQuery('div.subsubsub_section ul.subsubsub li a').click(function(){
+						var $clicked = jQuery(this);
+						var $section = $clicked.closest('.subsubsub_section');
+						var $target  = $clicked.attr('href');
+
+						$section.find('a').removeClass('current');
+
+						if ( $section.find('.section:visible').size() > 0 ) {
+							$section.find('.section:visible').fadeOut( 100, function() {
+								$section.find( $target ).fadeIn('fast');
+							});
+						} else {
+							$section.find( $target ).fadeIn('fast');
+						}
+
+						$clicked.addClass('current');
+						jQuery('#last_tab').val( $target );
+
+						return false;
+					});
+
+					<?php if (isset($_GET['subtab']) && $_GET['subtab']) echo 'jQuery("div.subsubsub_section ul.subsubsub li a[href=#'.$_GET['subtab'].']").click();'; ?>
 
 					// Countries
 					jQuery('select#woocommerce_allowed_countries').change(function(){
@@ -473,45 +439,6 @@ if ( ! function_exists( 'woocommerce_settings' ) ) {
 
 
 /**
- * Get a setting from the settings API.
- *
- * @access public
- * @param mixed $option
- * @return void
- */
-function woocommerce_settings_get_option( $option_name, $default = '' ) {
-	// Array value
-	if ( strstr( $option_name, '[' ) ) {
-
-		parse_str( $option_name, $option_array );
-
-		// Option name is first key
-		$option_name = current( array_keys( $option_array ) );
-
-		// Get value
-		$option_values = get_option( $option_name, '' );
-
-		$key = key( $option_array[ $option_name ] );
-
-		if ( isset( $option_values[ $key ] ) )
-			$option_value = $option_values[ $key ];
-		else
-			$option_value = null;
-
-	// Single value
-	} else {
-		$option_value = get_option( $option_name, null );
-	}
-
-	if ( is_array( $option_value ) )
-		$option_value = array_map( 'stripslashes', $option_value );
-	elseif ( ! is_null( $option_value ) )
-		$option_value = stripslashes( $option_value );
-
-	return $option_value === null ? $default : $option_value;
-}
-
-/**
  * Output admin fields.
  *
  * Loops though the woocommerce options array and outputs each field.
@@ -526,284 +453,142 @@ function woocommerce_admin_fields( $options ) {
     foreach ( $options as $value ) {
     	if ( ! isset( $value['type'] ) ) continue;
     	if ( ! isset( $value['id'] ) ) $value['id'] = '';
-    	if ( ! isset( $value['title'] ) ) $value['title'] = isset( $value['name'] ) ? $value['name'] : '';
+    	if ( ! isset( $value['name'] ) ) $value['name'] = '';
     	if ( ! isset( $value['class'] ) ) $value['class'] = '';
     	if ( ! isset( $value['css'] ) ) $value['css'] = '';
-    	if ( ! isset( $value['default'] ) ) $value['default'] = '';
+    	if ( ! isset( $value['std'] ) ) $value['std'] = '';
     	if ( ! isset( $value['desc'] ) ) $value['desc'] = '';
     	if ( ! isset( $value['desc_tip'] ) ) $value['desc_tip'] = false;
 
-    	// Custom attribute handling
-		$custom_attributes = array();
+    	if ( $value['desc_tip'] === true ) {
+    		$description = '<img class="help_tip" data-tip="' . esc_attr( $value['desc'] ) . '" src="' . $woocommerce->plugin_url() . '/assets/images/help.png" />';
+    	} elseif ( $value['desc_tip'] ) {
+    		$description = '<img class="help_tip" data-tip="' . esc_attr( $value['desc_tip'] ) . '" src="' . $woocommerce->plugin_url() . '/assets/images/help.png" />';
+    	} else {
+    		$description = '<span class="description">' . $value['desc'] . '</span>';
+    	}
 
-		if ( ! empty( $value['custom_attributes'] ) && is_array( $value['custom_attributes'] ) )
-			foreach ( $value['custom_attributes'] as $attribute => $attribute_value )
-				$custom_attributes[] = esc_attr( $attribute ) . '="' . esc_attr( $attribute_value ) . '"';
-
-		// Description handling
-		if ( $value['desc_tip'] === true ) {
-			$description = '';
-			$tip = $value['desc'];
-		} elseif ( ! empty( $value['desc_tip'] ) ) {
-			$description = $value['desc'];
-			$tip = $value['desc_tip'];
-		} elseif ( ! empty( $value['desc'] ) ) {
-			$description = $value['desc'];
-			$tip = '';
-		} else {
-			$description = $tip = '';
-		}
-
-		if ( $description && in_array( $value['type'], array( 'textarea', 'radio' ) ) ) {
-			$description = '<p style="margin-top:0">' . wp_kses_post( $description ) . '</p>';
-		} elseif ( $description ) {
-			$description = '<span class="description">' . wp_kses_post( $description ) . '</span>';
-		}
-
-		if ( $tip && in_array( $value['type'], array( 'checkbox' ) ) ) {
-
-			$tip = '<p class="description">' . $tip . '</p>';
-
-		} elseif ( $tip ) {
-
-			$tip = '<img class="help_tip" data-tip="' . esc_attr( $tip ) . '" src="' . $woocommerce->plugin_url() . '/assets/images/help.png" height="16" width="16" />';
-
-		}
-
-		// Switch based on type
         switch( $value['type'] ) {
-
-        	// Section Titles
             case 'title':
-            	if ( ! empty( $value['title'] ) ) echo '<h3>' . esc_html( $value['title'] ) . '</h3>';
-            	if ( ! empty( $value['desc'] ) ) echo wpautop( wptexturize( wp_kses_post( $value['desc'] ) ) );
+            	if ( isset($value['name'] ) && $value['name'] ) echo '<h3>' . $value['name'] . '</h3>';
+            	if ( isset($value['desc'] ) && $value['desc'] ) echo wpautop( wptexturize( $value['desc'] ) );
             	echo '<table class="form-table">'. "\n\n";
-            	if ( ! empty( $value['id'] ) ) do_action( 'woocommerce_settings_' . sanitize_title( $value['id'] ) );
+            	if ( isset($value['id'] ) && $value['id'] ) do_action( 'woocommerce_settings_' . sanitize_title($value['id'] ) );
             break;
-
-            // Section Ends
             case 'sectionend':
-            	if ( ! empty( $value['id'] ) ) do_action( 'woocommerce_settings_' . sanitize_title( $value['id'] ) . '_end' );
+            	if ( isset($value['id'] ) && $value['id'] ) do_action( 'woocommerce_settings_' . sanitize_title( $value['id'] ) . '_end' );
             	echo '</table>';
-            	if ( ! empty( $value['id'] ) ) do_action( 'woocommerce_settings_' . sanitize_title( $value['id'] ) . '_after' );
+            	if ( isset($value['id'] ) && $value['id'] ) do_action( 'woocommerce_settings_' . sanitize_title( $value['id'] ) . '_after' );
             break;
-
-            // Standard text inputs and subtypes like 'number'
             case 'text':
-            case 'email':
-            case 'number':
+            	?><tr valign="top">
+					<th scope="row" class="titledesc">
+						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo $value['name']; ?></label>
+					</th>
+                    <td class="forminp"><input name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" type="<?php echo esc_attr( $value['type'] ); ?>" style="<?php echo esc_attr( $value['css'] ); ?>" value="<?php if ( get_option( $value['id'] ) !== false && get_option( $value['id'] ) !== null ) { echo esc_attr( stripslashes( get_option($value['id'] ) ) ); } else { echo esc_attr( $value['std'] ); } ?>" /> <?php echo $description; ?></td>
+                </tr><?php
+            break;
             case 'color' :
-            case 'password' :
-
-            	$type 			= $value['type'];
-            	$class 			= '';
-            	$option_value 	= woocommerce_settings_get_option( $value['id'], $value['default'] );
-
-            	if ( $value['type'] == 'color' ) {
-            		$type = 'text';
-            		$value['class'] .= 'colorpick';
-	            	$description .= '<div id="colorPickerDiv_' . esc_attr( $value['id'] ) . '" class="colorpickdiv" style="z-index: 100;background:#eee;border:1px solid #ccc;position:absolute;display:none;"></div>';
-            	}
-
             	?><tr valign="top">
 					<th scope="row" class="titledesc">
-						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-						<?php echo $tip; ?>
+						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo $value['name']; ?></label>
 					</th>
-                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
-                    	<input
-                    		name="<?php echo esc_attr( $value['id'] ); ?>"
-                    		id="<?php echo esc_attr( $value['id'] ); ?>"
-                    		type="<?php echo esc_attr( $type ); ?>"
-                    		style="<?php echo esc_attr( $value['css'] ); ?>"
-                    		value="<?php echo esc_attr( $option_value ); ?>"
-                    		class="<?php echo esc_attr( $value['class'] ); ?>"
-                    		<?php echo implode( ' ', $custom_attributes ); ?>
-                    		/> <?php echo $description; ?>
-                    </td>
+                    <td class="forminp"><input name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" type="text" style="<?php echo esc_attr( $value['css'] ); ?>" value="<?php if ( get_option( $value['id'] ) !== false && get_option( $value['id'] ) !== null ) { echo esc_attr( stripslashes( get_option($value['id'] ) ) ); } else { echo esc_attr( $value['std'] ); } ?>" class="colorpick" /> <?php echo $description; ?> <div id="colorPickerDiv_<?php echo esc_attr( $value['id'] ); ?>" class="colorpickdiv" style="z-index: 100;background:#eee;border:1px solid #ccc;position:absolute;display:none;"></div></td>
                 </tr><?php
             break;
-
-            // Textarea
-            case 'textarea':
-
-            	$option_value 	= woocommerce_settings_get_option( $value['id'], $value['default'] );
-
+            case 'image_width' :
             	?><tr valign="top">
-					<th scope="row" class="titledesc">
-						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-						<?php echo $tip; ?>
-					</th>
-                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
-                    	<?php echo $description; ?>
+					<th scope="row" class="titledesc"><?php echo $value['name'] ?></th>
+                    <td class="forminp">
 
-                        <textarea
-                        	name="<?php echo esc_attr( $value['id'] ); ?>"
-                        	id="<?php echo esc_attr( $value['id'] ); ?>"
-                        	style="<?php echo esc_attr( $value['css'] ); ?>"
-                        	class="<?php echo esc_attr( $value['class'] ); ?>"
-                        	<?php echo implode( ' ', $custom_attributes ); ?>
-                        	><?php echo esc_textarea( $option_value );  ?></textarea>
-                    </td>
+                    	<?php _e('Width', 'woocommerce'); ?> <input name="<?php echo esc_attr( $value['id'] ); ?>_width" id="<?php echo esc_attr( $value['id'] ); ?>_width" type="text" size="3" value="<?php if ( $size = get_option( $value['id'].'_width') ) echo stripslashes($size); else echo $value['std']; ?>" />
+
+                    	<?php _e('Height', 'woocommerce'); ?> <input name="<?php echo esc_attr( $value['id'] ); ?>_height" id="<?php echo esc_attr( $value['id'] ); ?>_height" type="text" size="3" value="<?php if ( $size = get_option( $value['id'].'_height') ) echo stripslashes($size); else echo $value['std']; ?>" />
+
+                    	<label><?php _e('Hard Crop', 'woocommerce'); ?> <input name="<?php echo esc_attr( $value['id'] ); ?>_crop" id="<?php echo esc_attr( $value['id'] ); ?>_crop" type="checkbox" <?php if (get_option( $value['id'].'_crop')!='') checked(get_option( $value['id'].'_crop'), 1); else checked(1); ?> /></label>
+
+                    	<?php echo $description; ?></td>
                 </tr><?php
             break;
-
-            // Select boxes
-            case 'select' :
-            case 'multiselect' :
-
-            	$option_value 	= woocommerce_settings_get_option( $value['id'], $value['default'] );
-
+            case 'select':
             	?><tr valign="top">
 					<th scope="row" class="titledesc">
-						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-						<?php echo $tip; ?>
+						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo $value['name']; ?></label>
 					</th>
-                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
-                    	<select
-                    		name="<?php echo esc_attr( $value['id'] ); ?><?php if ( $value['type'] == 'multiselect' ) echo '[]'; ?>"
-                    		id="<?php echo esc_attr( $value['id'] ); ?>"
-                    		style="<?php echo esc_attr( $value['css'] ); ?>"
-                    		class="<?php echo esc_attr( $value['class'] ); ?>"
-                    		<?php echo implode( ' ', $custom_attributes ); ?>
-                    		<?php if ( $value['type'] == 'multiselect' ) echo 'multiple="multiple"'; ?>
-                    		>
-	                    	<?php
-		                        foreach ( $value['options'] as $key => $val ) {
-		                        	?>
-		                        	<option value="<?php echo esc_attr( $key ); ?>" <?php
-
-			                        	if ( is_array( $option_value ) )
-			                        		selected( in_array( $key, $option_value ), true );
-			                        	else
-			                        		selected( $option_value, $key );
-
-		                        	?>><?php echo $val ?></option>
-		                        	<?php
-		                        }
-		                    ?>
+                    <td class="forminp"><select name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" style="<?php echo esc_attr( $value['css'] ); ?>" class="<?php if (isset($value['class'])) echo $value['class']; ?>">
+                        <?php
+                        foreach ($value['options'] as $key => $val) {
+                        	$_current = get_option( $value['id'] );
+							if ( ! $_current ) {
+								$_current = $value['std'];
+							}
+                        	?>
+                        	<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $_current, $key ); ?>><?php echo $val ?></option>
+                        	<?php
+                        }
+                        ?>
                        </select> <?php echo $description; ?>
                     </td>
                 </tr><?php
             break;
-
-            // Radio inputs
-            case 'radio' :
-
-            	$option_value 	= woocommerce_settings_get_option( $value['id'], $value['default'] );
-
-            	?><tr valign="top">
-					<th scope="row" class="titledesc">
-						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-						<?php echo $tip; ?>
-					</th>
-                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
-                    	<fieldset>
-                    		<?php echo $description; ?>
-                    		<ul>
-                    		<?php
-                    			foreach ( $value['options'] as $key => $val ) {
-		                        	?>
-		                        	<li>
-		                        		<label><input
-			                        		name="<?php echo esc_attr( $value['id'] ); ?>"
-			                        		value="<?php echo $key; ?>"
-			                        		type="radio"
-				                    		style="<?php echo esc_attr( $value['css'] ); ?>"
-				                    		class="<?php echo esc_attr( $value['class'] ); ?>"
-				                    		<?php echo implode( ' ', $custom_attributes ); ?>
-				                    		<?php checked( $key, $option_value ); ?>
-			                        		/> <?php echo $val ?></label>
-		                        	</li>
-		                        	<?php
-		                        }
-                    		?>
-                    		</ul>
-                    	</fieldset>
-                    </td>
-                </tr><?php
-            break;
-
-            // Checkbox input
             case 'checkbox' :
 
-            	$option_value 	= woocommerce_settings_get_option( $value['id'], $value['default'] );
+            	if (!isset($value['hide_if_checked'])) $value['hide_if_checked'] = false;
+            	if (!isset($value['show_if_checked'])) $value['show_if_checked'] = false;
 
-            	if ( ! isset( $value['hide_if_checked'] ) ) $value['hide_if_checked'] = false;
-            	if ( ! isset( $value['show_if_checked'] ) ) $value['show_if_checked'] = false;
-
-            	if ( ! isset( $value['checkboxgroup'] ) || ( isset( $value['checkboxgroup'] ) && $value['checkboxgroup'] == 'start' ) ) {
+            	if (!isset($value['checkboxgroup']) || (isset($value['checkboxgroup']) && $value['checkboxgroup']=='start')) :
             		?>
             		<tr valign="top" class="<?php
-            			if ( $value['hide_if_checked'] == 'yes' || $value['show_if_checked']=='yes') echo 'hidden_option';
-            			if ( $value['hide_if_checked'] == 'option' ) echo 'hide_options_if_checked';
-            			if ( $value['show_if_checked'] == 'option' ) echo 'show_options_if_checked';
+            			if ($value['hide_if_checked']=='yes' || $value['show_if_checked']=='yes') echo 'hidden_option';
+            			if ($value['hide_if_checked']=='option') echo 'hide_options_if_checked';
+            			if ($value['show_if_checked']=='option') echo 'show_options_if_checked';
             		?>">
-					<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?></th>
-					<td class="forminp forminp-checkbox">
+					<th scope="row" class="titledesc"><?php echo $value['name'] ?></th>
+					<td class="forminp">
 						<fieldset>
 					<?php
-            	} else {
+            	else :
             		?>
             		<fieldset class="<?php
-            			if ( $value['hide_if_checked'] == 'yes' || $value['show_if_checked'] == 'yes') echo 'hidden_option';
-            			if ( $value['hide_if_checked'] == 'option') echo 'hide_options_if_checked';
-            			if ( $value['show_if_checked'] == 'option') echo 'show_options_if_checked';
+            			if ($value['hide_if_checked']=='yes' || $value['show_if_checked']=='yes') echo 'hidden_option';
+            			if ($value['hide_if_checked']=='option') echo 'hide_options_if_checked';
+            			if ($value['show_if_checked']=='option') echo 'show_options_if_checked';
             		?>">
             		<?php
-            	}
+            	endif;
 
             	?>
-		            <legend class="screen-reader-text"><span><?php echo esc_html( $value['title'] ) ?></span></legend>
-
+	            <legend class="screen-reader-text"><span><?php echo $value['name'] ?></span></legend>
 					<label for="<?php echo $value['id'] ?>">
-					<input
-						name="<?php echo esc_attr( $value['id'] ); ?>"
-						id="<?php echo esc_attr( $value['id'] ); ?>"
-						type="checkbox"
-						value="1"
-						<?php checked( $option_value, 'yes'); ?>
-						<?php echo implode( ' ', $custom_attributes ); ?>
-					/> <?php echo wp_kses_post( $value['desc'] ) ?></label> <?php echo $tip; ?>
+					<input name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" type="checkbox" value="1" <?php checked(get_option($value['id']), 'yes'); ?> />
+					<?php echo $value['desc'] ?></label> <?php if ( $value['desc_tip'] ) echo $description; ?><br />
 				<?php
 
-				if ( ! isset( $value['checkboxgroup'] ) || ( isset( $value['checkboxgroup'] ) && $value['checkboxgroup'] == 'end' ) ) {
+				if (!isset($value['checkboxgroup']) || (isset($value['checkboxgroup']) && $value['checkboxgroup']=='end')) :
 					?>
 						</fieldset>
 					</td>
 					</tr>
 					<?php
-				} else {
+				else :
 					?>
 					</fieldset>
 					<?php
-				}
+				endif;
 
             break;
-
-            // Image width settings
-            case 'image_width' :
-
-            	$width 	= woocommerce_settings_get_option( $value['id'] . '[width]', $value['default']['width'] );
-            	$height = woocommerce_settings_get_option( $value['id'] . '[height]', $value['default']['height'] );
-            	$crop 	= checked( 1, woocommerce_settings_get_option( $value['id'] . '[crop]', $value['default']['crop'] ), false );
-
+            case 'textarea':
             	?><tr valign="top">
-					<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo $tip; ?></th>
+					<th scope="row" class="titledesc">
+						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo $value['name']; ?></label>
+					</th>
                     <td class="forminp">
-
-                    	<?php _e( 'Width', 'woocommerce' ); ?> <input name="<?php echo esc_attr( $value['id'] ); ?>[width]" id="<?php echo esc_attr( $value['id'] ); ?>-width" type="text" size="3" value="<?php echo $width; ?>" />
-
-                    	<?php _e( 'Height', 'woocommerce' ); ?> <input name="<?php echo esc_attr( $value['id'] ); ?>[height]" id="<?php echo esc_attr( $value['id'] ); ?>-height" type="text" size="3" value="<?php echo $height; ?>" />
-
-                    	<label><?php _e( 'Hard Crop', 'woocommerce' ); ?> <input name="<?php echo esc_attr( $value['id'] ); ?>[crop]" id="<?php echo esc_attr( $value['id'] ); ?>-crop" type="checkbox" <?php echo $crop; ?> /></label>
-
-                    	</td>
+                        <textarea <?php if ( isset($value['args']) ) echo $value['args'] . ' '; ?>name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" style="<?php echo esc_attr( $value['css'] ); ?>"><?php if (false !== get_option($value['id'])) echo esc_textarea(stripslashes(get_option($value['id']))); else echo esc_textarea( $value['std'] ); ?></textarea> <?php echo $description; ?>
+                    </td>
                 </tr><?php
             break;
-
-            // Single page selects
             case 'single_select_page' :
+            	$page_setting = (int) get_option($value['id']);
 
             	$args = array( 'name'				=> $value['id'],
             				   'id'					=> $value['id'],
@@ -812,26 +597,20 @@ function woocommerce_admin_fields( $options ) {
             				   'show_option_none' 	=> ' ',
             				   'class'				=> $value['class'],
             				   'echo' 				=> false,
-            				   'selected'			=> absint( woocommerce_settings_get_option( $value['id'] ) )
-            				   );
+            				   'selected'			=> $page_setting);
 
-            	if( isset( $value['args'] ) )
-            		$args = wp_parse_args( $value['args'], $args );
+            	if( isset($value['args']) ) $args = wp_parse_args($value['args'], $args);
 
             	?><tr valign="top" class="single_select_page">
-                    <th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo $tip; ?></th>
+                    <th scope="row" class="titledesc"><?php echo $value['name'] ?></th>
                     <td class="forminp">
-			        	<?php echo str_replace(' id=', " data-placeholder='" . __( 'Select a page&hellip;', 'woocommerce' ) .  "' style='" . $value['css'] . "' class='" . $value['class'] . "' id=", wp_dropdown_pages( $args ) ); ?> <?php echo $description; ?>
+			        	<?php echo str_replace(' id=', " data-placeholder='".__('Select a page&hellip;', 'woocommerce')."' style='".$value['css']."' class='".$value['class']."' id=", wp_dropdown_pages($args)); ?> <?php echo $description; ?>
 			        </td>
                	</tr><?php
             break;
-
-            // Single country selects
             case 'single_select_country' :
-
-            	$country_setting = (string) woocommerce_settings_get_option( $value['id'] );
-
             	$countries = $woocommerce->countries->countries;
+            	$country_setting = (string) get_option($value['id']);
             	if (strstr($country_setting, ':')) :
             		$country = current(explode(':', $country_setting));
             		$state = end(explode(':', $country_setting));
@@ -841,41 +620,33 @@ function woocommerce_admin_fields( $options ) {
             	endif;
             	?><tr valign="top">
 					<th scope="row" class="titledesc">
-						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-						<?php echo $tip; ?>
+						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo $value['name']; ?></label>
 					</th>
-                    <td class="forminp"><select name="<?php echo esc_attr( $value['id'] ); ?>" style="<?php echo esc_attr( $value['css'] ); ?>" data-placeholder="<?php _e( 'Choose a country&hellip;', 'woocommerce' ); ?>" title="Country" class="chosen_select">
-			        	<?php echo $woocommerce->countries->country_dropdown_options( $country, $state ); ?>
+                    <td class="forminp"><select name="<?php echo esc_attr( $value['id'] ); ?>" style="<?php echo esc_attr( $value['css'] ); ?>" data-placeholder="<?php _e('Choose a country&hellip;', 'woocommerce'); ?>" title="Country" class="chosen_select">
+			        	<?php echo $woocommerce->countries->country_dropdown_options($country, $state); ?>
 			        </select> <?php echo $description; ?>
                		</td>
                	</tr><?php
             break;
-
-            // Country multiselects
             case 'multi_select_countries' :
-
-            	$selections = (array) woocommerce_settings_get_option( $value['id'] );
-
             	$countries = $woocommerce->countries->countries;
-            	asort( $countries );
+            	asort($countries);
+            	$selections = (array) get_option($value['id']);
             	?><tr valign="top">
 					<th scope="row" class="titledesc">
-						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-						<?php echo $tip; ?>
+						<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo $value['name']; ?></label>
 					</th>
                     <td class="forminp">
-	                    <select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:450px;" data-placeholder="<?php _e( 'Choose countries&hellip;', 'woocommerce' ); ?>" title="Country" class="chosen_select">
+	                    <select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:450px;" data-placeholder="<?php _e('Choose countries&hellip;', 'woocommerce'); ?>" title="Country" class="chosen_select">
 				        	<?php
-				        		if ( $countries )
-				        			foreach ( $countries as $key => $val )
-	                    				echo '<option value="'.$key.'" ' . selected( in_array( $key, $selections ), true, false ).'>' . $val . '</option>';
+				        		if ($countries) foreach ($countries as $key=>$val) :
+	                    			echo '<option value="'.$key.'" '.selected( in_array($key, $selections), true, false ).'>'.$val.'</option>';
+	                    		endforeach;
 	                    	?>
-				        </select> <?php echo $description; ?>
+				        </select>
                		</td>
                	</tr><?php
             break;
-
-            // Default: run an action
             default:
             	do_action( 'woocommerce_admin_field_' . $value['type'], $value );
             break;
