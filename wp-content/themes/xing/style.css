@@ -211,13 +211,14 @@ border-radius:0;
 .nav1 ul li.current-menu-item > a, .nav1 ul li.current-menu-ancestor > a { color:#777 }
 .nav1 ul { position:absolute; list-style:none; width:194px; top:42px; left:-1px; margin:0; padding:3px 0 2px; background:#fff; border:1px solid #e5e5e5; border-top:none; z-index:-1; display:none }
 .nav1 ul li { min-width:194px; float:none }
+.nav1 ul li:hover { min-width:194px; float:none; color:#333; background:#f3f3f3; }
 .nav1 ul a { display:block; margin:0 10px; padding:6px 0; color:#777; background:#fff; text-decoration:none; text-shadow:none; font-size:12px; font-weight:normal; border:none; border-bottom:1px solid #ebebeb }
 .nav1 ul li:last-child > a { border:none }
 .nav1 > li:hover > a { color:#333; background:#fff; text-shadow:none }
 .nav1 > li.arrow:hover > a { padding-bottom:13px }
 .nav1 li.current-menu-item:hover > a, .nav1 li.current-menu-ancestor:hover > a { color:#333 }
 .nav1 ul ul { left:194px; top:-3px; border-top:1px solid #e5e5e5; padding-top:2px }
-.nav1 ul li:hover > a, .nav1 ul li.current-menu-item:hover > a, .nav1 ul li.current-menu-ancestor:hover > a, .nav1 ul li.arrow:hover > a { color:#333 }
+.nav1 ul li:hover > a, .nav1 ul li.current-menu-item:hover > a, .nav1 ul li.current-menu-ancestor:hover > a, .nav1 ul li.arrow:hover > a { color:#333; background:#f3f3f3; }
 .nav1 li:hover ul ul, .nav1 li:hover ul ul ul, .nav1 li:hover ul ul ul ul { display:none }
 .nav1 li:hover ul, .nav1 li li:hover ul, .nav1 li li li:hover ul, .nav1 li li li li:hover ul { display:block }
 .ss_nav select { display:none; width:100% }
@@ -258,12 +259,13 @@ border-radius:0;
 /* -- 5. SIDEBAR -- */
 
 h3.sb-title { font-size:14px; line-height:18px; color:#555; padding-bottom:5px; border-bottom:1px solid #e5e5e5; margin-bottom:12px }
-#sidebar ul { margin:-6px 0 18px; padding:0; list-style:none }
+#sidebar ul { padding:0; list-style:none }
 #sidebar ul li { padding:6px 0; border-bottom:1px solid #eee; display:block }
+#sidebar ul li:hover { color:#333; padding:6px 0; border-bottom:1px solid #eee; display:block; background: #f3f3f3 }
 #sidebar ul ul { margin:6px 0; border-top:1px solid #eee }
 #sidebar ul ul li { padding-left:15px; background:url(images/list_arrow.gif) 4px 14px no-repeat }
 #sidebar ul ul li:last-child { border-bottom:none; padding-bottom:0 }
-#sidebar ul a { color:#777; text-decoration:none }
+#sidebar ul a { color:#777; text-decoration:none; margin: 0 10px; display: block;}
 #sidebar ul a:hover { color:#333; text-decoration:none }
 
 

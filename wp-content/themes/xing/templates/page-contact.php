@@ -4,6 +4,7 @@ Template Name: Contact Page
 */
 
 global $xng_sb_pos, $xng_email, $xng_success_msg, $xng_google_map;
+
 if(isset($_POST['submit'])) {
 
 	//Validate Name Field

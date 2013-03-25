@@ -16,7 +16,7 @@ ul.account-nav li.cart_status a:hover span.amount { color:#993366 }
 
 /* Primary Navigation Menu */
 .ss_nav { background:#e70103 }
-.nav1 > li > a { color:#e8eef0 }
+.nav1 > li > a { color:#fff }
 .nav1 > li:hover > a { color:#e70103; background:#fff; text-shadow:none; border-right-color:#fff }
 .nav1 li.current-menu-item > a, .nav1 li.current-menu-ancestor > a, .nav1 li.current-menu-item:hover > a, .nav1 li.current-menu-ancestor:hover > a { color:#e70103 }
 
@@ -34,7 +34,7 @@ ul.tag-list li a:hover, ul.tag-list li a:active { background:#e70103; color:#fff
 ul.tag-list li a:active { color:#999; color:rgba(255,255,255,0.5) }
 
 /* Footer */
-#footer { background:#e70103; color:#e8eef0 }
+#footer { background:#e70103; color:#fff }
 #footer a { color:#e8ebf0; border-bottom-color:rgba(255,255,255,0.3) }
 #footer a:hover { border-bottom-color:rgba(255,255,255,0.5) }
 .top_btn a { background-color:#e70103 }
@@ -42,7 +42,7 @@ ul.tag-list li a:active { color:#999; color:rgba(255,255,255,0.5) }
 
 /* WooCommerce */
 span.onsale { background:#e70103; color:#fff }
-.price ins { color:#993366; text-decoration:none; border-bottom:1px solid #993366 }
+.price ins { background: #fff; border-bottom:0px; color:#e70103; font-size: 13px; text-decoration:none }
 div.product span.price, div.product p.price, ul.products li.product span.price { color:#993366 }
 a.button.alt, button.button.alt, input.button.alt, #respond input#submit.alt { background-color:#993366 }
 a.button.added:before, button.button.added:before, input.button.added:before, #respond input#submit.added:before { background-color:#993366 }

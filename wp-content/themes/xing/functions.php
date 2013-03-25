@@ -568,6 +568,19 @@ if ( !function_exists( 'ss_scripts' ) ) :
 		}
 
 		// Miscellaneous
+		if ( is_user_logged_in() ) {
+			$params = array(
+              'isAdmin' => true
+            );
+        } else {
+        	$params = array(
+              'isAdmin' => false
+            );
+        }
+	    wp_register_script('mycustom', get_template_directory_uri().'/js/my.custom.js', '', '', true);
+	    wp_enqueue_script( 'mycustom');
+	    wp_localize_script( 'mycustom', 'params', $params);
+	
 		wp_enqueue_script('custom', get_template_directory_uri().'/js/custom.js', '', '', true);
 		wp_register_style( 'prettyphoto', get_template_directory_uri() . '/css/prettyPhoto.css', '', '', 'all' );
 		wp_enqueue_style( 'prettyphoto' );

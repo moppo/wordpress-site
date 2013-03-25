@@ -132,9 +132,10 @@ div.product span.price, div.product p.price, ul.products li.product span.price {
 }
 ul.products li.product span.price del, div.product p.price del, span.price del {
 	font-size:13px;
-	color:#555;
+	color:#e70103;
 	margin:0 4px 0 0;
-	font-weight:normal;
+	text-decoration: none;
+	/*font-weight:normal;*/
 }
 ul.products li.product span.price span.from, span.from {
 	font-size:11px;
@@ -154,14 +155,15 @@ div.product .out-of-stock {
 }
 div.product div.images {
 	float:left;
-	width:372px;
+	width:300px;
 	margin-bottom:20px;
 }
 div.product div.images img {
 	display:block;
-	width:370px;
+	width:250px;
 	height:auto;
 	border:1px solid #e5e5e5;
+	margin: auto;
 }
 div.product div.images a.zoom:hover img {
 	border-color:#ccc;
