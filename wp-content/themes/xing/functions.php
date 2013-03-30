@@ -570,11 +570,13 @@ if ( !function_exists( 'ss_scripts' ) ) :
 		// Miscellaneous
 		if ( is_user_logged_in() ) {
 			$params = array(
-              'isAdmin' => true
+              'isAdmin' => true,
+              'isHomePage' => is_page('home')
             );
         } else {
         	$params = array(
-              'isAdmin' => false
+              'isAdmin' => false,
+              'isHomePage' => is_page('home')
             );
         }
 	    wp_register_script('mycustom', get_template_directory_uri().'/js/my.custom.js', '', '', true);
