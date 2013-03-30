@@ -174,7 +174,7 @@ ul.account-nav li a.log_in, ul.account-nav li a.log_out { border:none; padding-r
 /* Logo and Blog Name */
 .brand { position:relative; overflow:hidden; float:left; width:auto; margin:0; padding:25px 0 25px 20px }
 .brand.right { float:right; padding-left:0; padding-right:20px }
-.brand.no-callout { padding-top:0; margin-top:-35px }
+.brand.no-callout { padding-top:0; margin-top:20px }
 .brand.right.no-callout { padding-top:25px; margin-top:0px }
 .brand h1 { margin:0 }
 .brand h2#site-description { font-size:12px; line-height:18px; margin-bottom:0; color:#777 }
@@ -184,7 +184,7 @@ ul.account-nav li a.log_in, ul.account-nav li a.log_out { border:none; padding-r
 .blogname a:hover { text-decoration:none }
 
 /* Header Widget Area */
-.header-widget-area { position:relative; overflow:hidden; float:right; padding:0 20px 0 0; margin:25px 0 15px 0; width:460px; text-align:right; text-shadow:0 1px 0 rgba(255,255,255,0.3) }
+.header-widget-area { position:relative; overflow:hidden; float:right; padding:0 20px 0 0; margin:25px 0 15px 0; width:280px; text-align:right; text-shadow:0 1px 0 rgba(255,255,255,0.3) }
 .hwa_wrap { position:relative; overflow:hidden; display:block; margin-bottom:10px }
 .header-widget-area .hwa_wrap * { margin-bottom:0 }
 .header-widget-area.left { text-align:left; padding-right:0; padding-left:20px }
@@ -911,3 +911,17 @@ img.alignleft, img.alignright, img.aligncenter { margin-bottom: 18px; }
 .gallery dl { margin: 0; }
 .gallery br+br { display: none; }
 #content .attachment img { display: block; margin: 0 auto }
+
+/* start up popup */
+* { margin:0; padding:0; font-family:Arial, Helvetica, sans-serif; } 
+a#show-popup { margin:20px 0 0 20px; float:left; text-decoration:none; } 
+div#popup-bg { position:absolute; top:0; bottom:0; left:0; right:0; z-index:99; background:#000;
+display:none; } 
+div#popup { width:680px; height:480px; border:solid 1px
+#d5d5d5; z-index:1000; display:none; background:#FFF; } 
+div#popup-header { position:relative; float:left; width:680px; line-height:30px; font-size:20px;
+ cursor:move; } 
+span#popup-close { cursor:pointer;
+color:#000; font-size:12px; position:absolute; top:-2px; right:10px; z-index:9999;
+} 
+div#popup-content { width:670px; float:left; padding:5px; }

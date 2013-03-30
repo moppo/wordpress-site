@@ -28,6 +28,23 @@ wp_head(); ?>
 $new_body_class  = ( $xng_layout == 'stretched' ) ? 'is-stretched' : '';
 $new_body_class .= ( $xng_top_bar_hide != 'true' ) ? ' no-border' : ''; ?>
 <body <?php body_class($new_body_class); ?>>
+
+    
+    <!-- start up popup -->
+    <div id="popup-bg"></div>
+    <div id="popup">
+        <div id="popup-header">
+            <span id="popup-close" title="Close">
+                X
+            </span>
+        </div>
+        <div id="popup-content">
+            Content
+            <img style="width:650px" src="/samsung_lap.jpeg">
+        </div>
+    </div>
+    <!-- End startup popup -->
+
 <?php if($xng_top_bar_hide != 'true') { ?>
     <nav id="top-menu" class="ss_nav_top">
         <div class="wrap clearfix">
@@ -44,8 +61,8 @@ $new_body_class .= ( $xng_top_bar_hide != 'true' ) ? ' no-border' : ''; ?>
 			<?php if($xng_cb_hide != 'true') { ?>
                 <div id="callout"><?php echo stripslashes($xng_cb_text); ?></div><!-- #callout -->
             <?php }
-            if (class_exists( 'woocommerce' ))
-                get_template_part('woocommerce/account-bar'); ?>
+            //if (class_exists( 'woocommerce' ))
+                //get_template_part('woocommerce/account-bar'); ?>
             </div><!-- #utlity .wrap -->
         </div><!-- #utility -->
         <div id="header">
