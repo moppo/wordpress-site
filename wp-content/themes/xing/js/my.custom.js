@@ -23,7 +23,7 @@ $s(function() {
 
         var expDays = 0.25;
         var exp = new Date();
-        exp.setTime(exp.getTime() + (expDays * 24 * 60 * 60 * 1000));
+        exp.setTime(exp.getTime() + (expDays  * 60 * 60 * 1000));
 
         checkCount();
         
@@ -32,9 +32,6 @@ $s(function() {
             if (count == null) {
                 count = 1;
                 SetCookie('count', count, exp);
-
-                //window.open(page, "", windowprops);
-
 
                 $s(document).ready(function() {
                   (function($s) {

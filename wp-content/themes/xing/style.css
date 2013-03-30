@@ -184,7 +184,7 @@ ul.account-nav li a.log_in, ul.account-nav li a.log_out { border:none; padding-r
 .blogname a:hover { text-decoration:none }
 
 /* Header Widget Area */
-.header-widget-area { position:relative; overflow:hidden; float:right; padding:0 20px 0 0; margin:25px 0 15px 0; width:280px; text-align:right; text-shadow:0 1px 0 rgba(255,255,255,0.3) }
+.header-widget-area { position:relative; overflow:hidden; float:right; padding:0 20px 0 0; margin:5px 0 15px 0; width:320px; text-align:right; text-shadow:0 1px 0 rgba(255,255,255,0.3) }
 .hwa_wrap { position:relative; overflow:hidden; display:block; margin-bottom:10px }
 .header-widget-area .hwa_wrap * { margin-bottom:0 }
 .header-widget-area.left { text-align:left; padding-right:0; padding-left:20px }
@@ -925,3 +925,7 @@ span#popup-close { cursor:pointer;
 color:#000; font-size:12px; position:absolute; top:-2px; right:10px; z-index:9999;
 } 
 div#popup-content { width:670px; float:left; padding:5px; }
+
+div.textwidget {float: left;}
+div.flexytalk {margin: 10px 0 10px 0; height: 22px;}
+div.ui-widget-header {padding: 0 0 0 0 !important;}
