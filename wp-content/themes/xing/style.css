@@ -435,7 +435,7 @@ h3.sc-title { font-size:14px; line-height:21px; color:#555; margin-bottom:15px }
 #footer { color:#ccc; font-size:11px; text-shadow:1px 1px 0 rgba(0,0,0,0.2) }
 #footer a { color:#ccc; border-bottom:1px solid #777 }
 #footer a:hover { color:#fff; border-bottom-color:#999 }
-.notes_left { position:relative; overflow:hidden; float:left; width:50% }
+.notes_left { position:relative; overflow:hidden; margin: auto; width:100%; text-align: center;}
 .notes_right { position:relative; overflow:hidden; float:right; width:50%; text-align:right }
 .top_btn { position:fixed; right:20px; bottom:20px }
 .is-stretched .top_btn { bottom:11px }
@@ -925,7 +925,9 @@ span#popup-close { cursor:pointer;
 color:#000; font-size:12px; position:absolute; top:-2px; right:10px; z-index:9999;
 } 
 div#popup-content { width:670px; float:left; padding:5px; }
+/* start up popup */
 
+/* Hotline and Chat section */
 div.textwidget {float: left;}
 div.flexytalk {margin: 10px 0 10px 0; height: 22px;}
 div.ui-widget-header {padding: 0 0 0 0 !important;}

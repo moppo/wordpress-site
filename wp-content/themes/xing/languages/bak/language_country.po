@@ -2,133 +2,111 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Xing v1.0.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-30 13:23+0700\n"
-"PO-Revision-Date: 2013-03-31 12:11+0700\n"
-"Last-Translator: Vi Quoc Hanh <hanhvq@gmail.com>\n"
+"POT-Creation-Date: 2012-10-13 15:31+0530\n"
+"PO-Revision-Date: 2012-10-13 15:31+0530\n"
+"Last-Translator: Saurabh <saagar_1982@yahoo.com>\n"
 "Language-Team: Saurabh Sharma <saagar_1982@yahoo.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _e;__\n"
 "X-Poedit-Basepath: ./\n"
-"X-Generator: Poedit 1.5.5\n"
 "X-Poedit-SearchPath-0: ..\n"
 
 #: ../404.php:8
 msgid "Not Found!"
-msgstr "Không tìm thấy dữ liệu!"
+msgstr ""
 
 #: ../404.php:9
-msgid ""
-"Apologies, but the page you requested could not be found. Perhaps searching "
-"will help."
+msgid "Apologies, but the page you requested could not be found. Perhaps searching will help."
 msgstr ""
-"Không tìm thấy trang yêu cầu. Có thể công cụ tìm kiếm sẽ hỗ trợ cho bạn."
 
 #: ../archive.php:19
 #, php-format
 msgid "About <span class=\"fn\">%s</span>"
-msgstr "Về <span class=\"fn\">%s</span>"
+msgstr ""
 
 #: ../attachment.php:40
 msgid "Read more &rarr;"
-msgstr "Đọc tiếp &rarr;"
-
-#: ../attachment.php:44 ../content-list.php:7 ../content.php:7 ../page.php:14
-#: ../single.php:88 ../templates/blog-grid.php:67
-#: ../templates/blog-list.php:62 ../templates/page-contact.php:101
-#: ../templates/page-full.php:15 ../templates/page-sb-left.php:15
-#: ../templates/page-sb-right.php:15 ../templates/port3-sb-filterable.php:78
-#: ../templates/port3-sb.php:73 ../templates/port4-filterable.php:77
-#: ../templates/port4-sb-filterable.php:77 ../templates/port4-sb.php:73
-#: ../templates/port4.php:72 ../templates/port5-filterable.php:76
-#: ../templates/port5.php:72
-msgid "Not Found"
-msgstr "Không tìm thấy"
-
-#: ../attachment.php:45 ../content-list.php:8 ../content.php:8 ../page.php:15
-#: ../single.php:89 ../templates/blog-grid.php:68
-#: ../templates/blog-list.php:63 ../templates/page-contact.php:102
-#: ../templates/page-full.php:16 ../templates/page-sb-left.php:16
-#: ../templates/page-sb-right.php:16 ../templates/port3-sb-filterable.php:79
-#: ../templates/port3-sb.php:74 ../templates/port4-filterable.php:78
-#: ../templates/port4-sb-filterable.php:78 ../templates/port4-sb.php:74
-#: ../templates/port4.php:73 ../templates/port5-filterable.php:77
-#: ../templates/port5.php:73
-msgid ""
-"Apologies, but no results were found for the requested archive. Perhaps "
-"searching will help find a related post."
 msgstr ""
-"Không tìm thấy trang yêu cầu. Có thể công cụ tìm kiếm sẽ hỗ trợ cho bạn tìm "
-"các bài viết liên quan."
+
+#: ../attachment.php:44
+#: ../content-list.php:7
+#: ../content.php:7
+#: ../page.php:14
+#: ../single.php:88
+msgid "Not Found"
+msgstr ""
+
+#: ../attachment.php:45
+#: ../content-list.php:8
+#: ../content.php:8
+#: ../page.php:15
+#: ../single.php:89
+msgid "Apologies, but no results were found for the requested archive. Perhaps searching will help find a related post."
+msgstr ""
 
 #: ../comments.php:6
-msgid ""
-"This post is password protected. Enter the password to view any comments."
-msgstr "Cần cung cấp mật khẩu để có thể thêm nhận xét cho bài viết."
+msgid "This post is password protected. Enter the password to view any comments."
+msgstr ""
 
 #: ../comments.php:15
 msgid "&larr; Older Comments"
-msgstr "&larr; Các nhận xét trước đây"
+msgstr ""
 
 #: ../comments.php:16
 msgid "Newer Comments &rarr;"
-msgstr "Các nhận xét gần đây  &rarr;"
+msgstr ""
 
 #: ../comments.php:23
 #, php-format
 msgid "You must be <a href=\"%s\">logged in</a> to post a comment."
-msgstr "Bạn phải <a href=\"%s\">đăng nhập</a> để đăng bài viết."
+msgstr ""
 
 #: ../comments.php:24
 #, php-format
-msgid ""
-"Logged in as <a href=\"%1$s\">%2$s</a>. <a href=\"%3$s\" title=\"Log out of "
-"this account\">Log out?</a>"
+msgid "Logged in as <a href=\"%1$s\">%2$s</a>. <a href=\"%3$s\" title=\"Log out of this account\">Log out?</a>"
 msgstr ""
-"<a href=\"%1$s\">%2$s</a>. <a href=\"%3$s\" title=\"Đăng xuất\">Thoát?</a>"
 
 #: ../comments.php:25
 msgid "Leave a reply"
-msgstr "Để lại phản hồi"
+msgstr ""
 
 #: ../comments.php:27
 msgid "Comment*"
-msgstr "Nhận xét*"
+msgstr ""
 
 #: ../comments.php:28
 msgid "Your email address will not be published. "
-msgstr "Địa chỉ email của bạn sẽ được đảm bảo không bị công khai."
+msgstr ""
 
 #: ../comments.php:28
 msgid "Required fields are marked *"
-msgstr "Các trường bắt buộc được đánh dấu *"
+msgstr ""
 
 #: ../comments.php:29
 msgid "Post Comment"
-msgstr "Thêm nhận xét"
+msgstr ""
 
-#: ../content-list.php:20 ../templates/blog-list.php:48
+#: ../content-list.php:20
 msgid "Read full post"
-msgstr "Xem toàn bộ bài viết"
+msgstr ""
 
-#: ../content-list.php:20 ../templates/blog-list.php:48
+#: ../content-list.php:20
 msgid "Read More"
-msgstr "Xem tiếp"
+msgstr ""
 
-#: ../content-list.php:28 ../content.php:30 ../search.php:19
-#: ../templates/blog-grid.php:61 ../templates/blog-list.php:56
-#: ../templates/port3-sb.php:67 ../templates/port4-sb.php:67
-#: ../templates/port4.php:66 ../templates/port5.php:66
+#: ../content-list.php:28
+#: ../content.php:30
+#: ../search.php:19
 msgid "&larr; Older Posts"
-msgstr "&larr; Các bài viết trước đây"
+msgstr ""
 
-#: ../content-list.php:29 ../content.php:31 ../search.php:20
-#: ../templates/blog-grid.php:62 ../templates/blog-list.php:57
-#: ../templates/port3-sb.php:68 ../templates/port4-sb.php:68
-#: ../templates/port4.php:67 ../templates/port5.php:67
+#: ../content-list.php:29
+#: ../content.php:31
+#: ../search.php:20
 msgid "Newer Posts &rarr;"
-msgstr "Các bài viết mới nhất &rarr;"
+msgstr ""
 
 #: ../footer.php:64
 msgid "Scroll to top"
@@ -162,8 +140,11 @@ msgstr ""
 msgid "Default Secondary Column 1"
 msgstr ""
 
-#: ../functions.php:98 ../functions.php:108 ../functions.php:118
-#: ../functions.php:128 ../functions.php:138
+#: ../functions.php:98
+#: ../functions.php:108
+#: ../functions.php:118
+#: ../functions.php:128
+#: ../functions.php:138
 msgid "Secondary Column"
 msgstr ""
 
@@ -197,8 +178,10 @@ msgstr ""
 msgid "Pingback:"
 msgstr ""
 
-#: ../functions.php:187 ../functions.php:212 ../functions.php:326
-#: ../functions.php:349 ../wpsc-products_page.php:213
+#: ../functions.php:187
+#: ../functions.php:212
+#: ../functions.php:326
+#: ../functions.php:349
 msgid "Edit"
 msgstr ""
 
@@ -238,18 +221,8 @@ msgstr ""
 
 #: ../functions.php:312
 #, php-format
-msgid ""
-"<span class=\"sep\">Posted on </span><a href=\"%1$s\" title=\"%2$s\" rel="
-"\"bookmark\"><time class=\"entry-date\" datetime=\"%3$s\" pubdate>%4$s</"
-"time></a><span class=\"by-author\"> <span class=\"sep\"> by </span> <span "
-"class=\"author vcard\"><a class=\"url fn n\" href=\"%5$s\" title=\"%6$s\" "
-"rel=\"author\">%7$s</a></span></span> <span class=\"sep\"> in </span>%8$s "
+msgid "<span class=\"sep\">Posted on </span><a href=\"%1$s\" title=\"%2$s\" rel=\"bookmark\"><time class=\"entry-date\" datetime=\"%3$s\" pubdate>%4$s</time></a><span class=\"by-author\"> <span class=\"sep\"> by </span> <span class=\"author vcard\"><a class=\"url fn n\" href=\"%5$s\" title=\"%6$s\" rel=\"author\">%7$s</a></span></span> <span class=\"sep\"> in </span>%8$s "
 msgstr ""
-"<span class=\"sep\">Đăng vào </span><a href=\"%1$s\" title=\"%2$s\" rel="
-"\"bookmark\"><time class=\"entry-date\" datetime=\"%3$s\" pubdate>%4$s</"
-"time></a><span class=\"by-author\"> <span class=\"sep\"> by </span> <span "
-"class=\"author vcard\"><a class=\"url fn n\" href=\"%5$s\" title=\"%6$s\" "
-"rel=\"author\">%7$s</a></span></span> <span class=\"sep\"> in </span>%8$s "
 
 #: ../functions.php:318
 #, php-format
@@ -260,23 +233,24 @@ msgstr ""
 msgid " with "
 msgstr ""
 
-#: ../functions.php:324 ../functions.php:341
+#: ../functions.php:324
+#: ../functions.php:341
 msgid "0 Comments"
-msgstr "Chưa có nhận xét"
+msgstr ""
 
-#: ../functions.php:324 ../functions.php:341
+#: ../functions.php:324
+#: ../functions.php:341
 msgid "1 Comment"
-msgstr "1 Nhận xét"
+msgstr ""
 
-#: ../functions.php:324 ../functions.php:341
+#: ../functions.php:324
+#: ../functions.php:341
 msgid "% Comments"
-msgstr "% Nhận xét"
+msgstr ""
 
 #: ../functions.php:333
 #, php-format
-msgid ""
-"<a href=\"%1$s\" title=\"%2$s\" rel=\"bookmark\"><time class=\"entry-date\" "
-"datetime=\"%3$s\" pubdate>%4$s</time></a>"
+msgid "<a href=\"%1$s\" title=\"%2$s\" rel=\"bookmark\"><time class=\"entry-date\" datetime=\"%3$s\" pubdate>%4$s</time></a>"
 msgstr ""
 
 #: ../functions.php:340
@@ -298,59 +272,45 @@ msgid "Link to full-size image"
 msgstr ""
 
 #: ../functions.php:500
-msgid ""
-"<span class=\"menu_notifier\">Navigation Menu not configured yet. Please "
-"configure it inside WordPress <strong>Appearance > Menus</strong></span>"
-msgstr ""
-
-#: ../functions.php:648
-msgid "Viet Nam Dong"
+msgid "<span class=\"menu_notifier\">Navigation Menu not configured yet. Please configure it inside WordPress <strong>Appearance > Menus</strong></span>"
 msgstr ""
 
 #: ../header.php:19
 #, php-format
 msgid "Page %s"
-msgstr "Trang %s"
+msgstr ""
 
-#: ../page.php:10 ../templates/page-full.php:11
-#: ../templates/page-sb-left.php:11 ../templates/page-sb-right.php:11
+#: ../page.php:10
 msgid "More &rarr;"
-msgstr "Thêm &rarr;"
+msgstr ""
 
-#: ../page.php:11 ../single.php:42 ../templates/page-full.php:12
-#: ../templates/page-sb-left.php:12 ../templates/page-sb-right.php:12
+#: ../page.php:11
+#: ../single.php:42
 msgid "Pages:"
-msgstr "Trang:"
+msgstr ""
 
 #: ../search.php:26
 msgid "Nothing Found!"
-msgstr "Không tìm thấy kết quả!"
+msgstr ""
 
 #: ../search.php:27
-msgid ""
-"Sorry, but nothing matched your search criteria. Please try again with some "
-"different keywords."
+msgid "Sorry, but nothing matched your search criteria. Please try again with some different keywords."
 msgstr ""
-"Không tìm thấy kết quả nào phù hợp. Hãy thay đổi điều kiện tìm kiếm khác."
 
 #: ../searchform.php:5
 msgid "Search this site"
-msgstr "Tìm kiếm"
+msgstr ""
 
 #: ../searchform.php:12
 msgid "Search"
-msgstr "Tìm kiếm"
+msgstr ""
 
 #: ../sidebar.php:19
-msgid ""
-"<h4>Sidebar not configured yet.</h4><p>You can place widgets by navigating "
-"to WordPress Appearance > Widgets.</p>"
+msgid "<h4>Sidebar not configured yet.</h4><p>You can place widgets by navigating to WordPress Appearance > Widgets.</p>"
 msgstr ""
 
 #: ../sidebar.php:29
-msgid ""
-"<p>Sidebar not configured yet. You can place widgets by navigating to "
-"WordPress Appearance > Widgets.</p>"
+msgid "<p>Sidebar not configured yet. You can place widgets by navigating to WordPress Appearance > Widgets.</p>"
 msgstr ""
 
 #: ../single.php:45
@@ -361,147 +321,10 @@ msgstr ""
 #: ../single.php:66
 #, php-format
 msgid "View all posts by %s &rarr;"
-msgstr "Hiển thị toàn bộ %s &rarr;"
-
-#: ../wpsc-products_page.php:113
-msgid "More Details"
-msgstr "Chi tiết"
-
-#: ../wpsc-products_page.php:130
-msgid "Product Options"
 msgstr ""
 
-#: ../wpsc-products_page.php:150
-msgid "Quantity"
-msgstr ""
-
-#: ../wpsc-products_page.php:163
-msgid "Product in stock"
-msgstr ""
-
-#: ../wpsc-products_page.php:165
-msgid "Product not in stock"
-msgstr ""
-
-#: ../wpsc-products_page.php:169
-msgid "Donation"
-msgstr ""
-
-#: ../wpsc-products_page.php:174
-msgid "Old Price"
-msgstr ""
-
-#: ../wpsc-products_page.php:176 ../wpsc-user-log.php:107
-msgid "Price"
-msgstr "Giá"
-
-#: ../wpsc-products_page.php:178
-msgid "You save"
-msgstr ""
-
-#: ../wpsc-products_page.php:187
-msgid "Shipping"
-msgstr ""
-
-#: ../wpsc-products_page.php:201
-msgid "Updating cart..."
-msgstr ""
-
-#: ../wpsc-products_page.php:205
-msgid "Buy Now"
-msgstr ""
-
-#: ../wpsc-products_page.php:207
-msgid "Add To Cart"
-msgstr ""
-
-#: ../wpsc-products_page.php:227
-msgid "Sale"
-msgstr ""
-
-#: ../wpsc-products_page.php:234
-msgid "There are no products in this group."
-msgstr "Không có sản phẩm thuộc loại này."
-
-#: ../wpsc-transaction_results.php:24
-msgid "Oops, there is nothing in your cart."
-msgstr ""
-
-#: ../wpsc-transaction_results.php:24
-msgid "Please visit our shop"
-msgstr ""
-
-#: ../wpsc-user-log.php:17
-msgid "Purchase History"
-msgstr ""
-
-#: ../wpsc-user-log.php:18
-msgid "Your Details"
-msgstr ""
-
-#: ../wpsc-user-log.php:19
-msgid "Your Downloads"
-msgstr ""
-
-#: ../wpsc-user-log.php:40
-msgid "Save Profile"
-msgstr ""
-
-#: ../wpsc-user-log.php:52
-msgid "File Names"
-msgstr ""
-
-#: ../wpsc-user-log.php:53
-msgid "Downloads Left"
-msgstr ""
-
-#: ../wpsc-user-log.php:54 ../wpsc-user-log.php:106
-msgid "Date"
-msgstr ""
-
-#: ../wpsc-user-log.php:90
-msgid "You have not purchased any downloadable products yet."
-msgstr ""
-
-#: ../wpsc-user-log.php:105
-msgid "Status"
-msgstr ""
-
-#: ../wpsc-user-log.php:111
-msgid "Payment Method"
-msgstr ""
-
-#: ../wpsc-user-log.php:124
-msgid "No transactions for this month."
-msgstr ""
-
-#: ../wpsc-user-log.php:137
-msgid "There have not been any purchases yet."
-msgstr ""
-
-#: ../wpsc-user-log.php:145
-msgid ""
-"You must be logged in to use this page. Please use the form below to login "
-"to your account."
-msgstr ""
-
-#: ../wpsc-user-log.php:149
-msgid "Username:"
-msgstr ""
-
-#: ../wpsc-user-log.php:153
-msgid "Password:"
-msgstr ""
-
-#: ../wpsc-user-log.php:159
-msgid "Remember me"
-msgstr ""
-
-#: ../wpsc-user-log.php:164
-msgid "Login &raquo;"
-msgstr ""
-
-#: ../formats/grid-format-video.php:11 ../formats/single-format-video.php:13
+#: ../formats/grid-format-video.php:11
+#: ../formats/single-format-video.php:13
 msgid "<span class=\"no-video\">No video URL found.</span>"
 msgstr ""
 
@@ -554,10 +377,9 @@ msgstr ""
 msgid "Select Category"
 msgstr ""
 
-#: ../includes/cats-widget.php:63 ../includes/flickr-widget.php:98
-#: ../includes/minifolio-widget.php:82 ../includes/popular-posts-widget.php:89
-#: ../includes/recent-posts-widget.php:95
-#: ../includes/social-links-widget.php:123 ../includes/twitter-widget.php:59
+#: ../includes/cats-widget.php:63
+#: ../includes/flickr-widget.php:98
+#: ../includes/minifolio-widget.php:82
 msgid "Title:"
 msgstr ""
 
@@ -585,7 +407,8 @@ msgstr ""
 msgid "A flickr widget to display your photostream from flickr."
 msgstr ""
 
-#: ../includes/flickr-widget.php:7 ../includes/flickr-widget.php:12
+#: ../includes/flickr-widget.php:7
+#: ../includes/flickr-widget.php:12
 msgid "Xing Flickr Widget"
 msgstr ""
 
@@ -605,10 +428,7 @@ msgstr ""
 msgid "User Set"
 msgstr ""
 
-#: ../includes/flickr-widget.php:105 ../templates/port3-sb-filterable.php:22
-#: ../templates/port4-filterable.php:21
-#: ../templates/port4-sb-filterable.php:22
-#: ../templates/port5-filterable.php:21
+#: ../includes/flickr-widget.php:105
 msgid "All"
 msgstr ""
 
@@ -625,9 +445,7 @@ msgid "User ID:"
 msgstr ""
 
 #: ../includes/flickr-widget.php:113
-msgid ""
-"This would be a Flickr photostream ID. Eg: 48531931%40N03, where %40 is "
-"replaced for @"
+msgid "This would be a Flickr photostream ID. Eg: 48531931%40N03, where %40 is replaced for @"
 msgstr ""
 
 #: ../includes/flickr-widget.php:117
@@ -674,7 +492,7 @@ msgstr ""
 msgid "Text to appear before gallery:"
 msgstr ""
 
-#: ../includes/flickr-widget.php:144 ../includes/twitter-widget.php:69
+#: ../includes/flickr-widget.php:144
 msgid "You can use basic HTML here."
 msgstr ""
 
@@ -686,47 +504,43 @@ msgstr ""
 msgid "Xing Mini Folio"
 msgstr ""
 
-#: ../includes/minifolio-widget.php:26 ../includes/recent-posts-widget.php:27
+#: ../includes/minifolio-widget.php:26
 msgid "Recent Posts"
 msgstr ""
 
-#: ../includes/minifolio-widget.php:85 ../includes/popular-posts-widget.php:92
-#: ../includes/recent-posts-widget.php:98
+#: ../includes/minifolio-widget.php:85
 msgid "Number of posts to show:"
 msgstr ""
 
-#: ../includes/minifolio-widget.php:87 ../includes/popular-posts-widget.php:94
-#: ../includes/recent-posts-widget.php:100
+#: ../includes/minifolio-widget.php:87
 msgid "(at most 15)"
 msgstr ""
 
-#: ../includes/minifolio-widget.php:89 ../includes/recent-posts-widget.php:106
+#: ../includes/minifolio-widget.php:89
 msgid "Cat IDs to exclude or include:"
 msgstr ""
 
-#: ../includes/minifolio-widget.php:92 ../includes/recent-posts-widget.php:109
-msgid ""
-"Category IDs, separated by commas. Eg: 3,6,7 to include. Or -3,-6,-7 to "
-"exclude."
+#: ../includes/minifolio-widget.php:92
+msgid "Category IDs, separated by commas. Eg: 3,6,7 to include. Or -3,-6,-7 to exclude."
 msgstr ""
 
-#: ../includes/page-options.php:7 ../includes/post-options.php:7
+#: ../includes/page-options.php:7
 msgid "Sidebar Options"
 msgstr ""
 
-#: ../includes/page-options.php:11 ../includes/post-options.php:11
+#: ../includes/page-options.php:11
 msgid "Available widget areas for Sidebar"
 msgstr ""
 
-#: ../includes/page-options.php:13 ../includes/post-options.php:13
+#: ../includes/page-options.php:13
 msgid "Select a widget area to use on Sidebar"
 msgstr ""
 
-#: ../includes/page-options.php:17 ../includes/post-options.php:17
+#: ../includes/page-options.php:17
 msgid "Available widget areas for Header Section"
 msgstr ""
 
-#: ../includes/page-options.php:19 ../includes/post-options.php:19
+#: ../includes/page-options.php:19
 msgid "Select a widget area to use on Header Section"
 msgstr ""
 
@@ -743,12 +557,7 @@ msgid "Create an exclusive Header Widget Area for this page."
 msgstr ""
 
 #: ../includes/page-options.php:31
-msgid ""
-"Check to create an exclusive Header Sidebar for this page. <br/><br/>On "
-"checking these options, a new Widget Area will be created in the name of "
-"this page. Once you publish or update this page, the new sidebar will appear "
-"inside the dropdown menu. You can select that new sidebar and update the "
-"page again. You can remove the sidebar by unchecking these options."
+msgid "Check to create an exclusive Header Sidebar for this page. <br/><br/>On checking these options, a new Widget Area will be created in the name of this page. Once you publish or update this page, the new sidebar will appear inside the dropdown menu. You can select that new sidebar and update the page again. You can remove the sidebar by unchecking these options."
 msgstr ""
 
 #: ../includes/page-options.php:37
@@ -760,9 +569,7 @@ msgid "Category IDs to fetch Portfolio or Blog Posts"
 msgstr ""
 
 #: ../includes/page-options.php:43
-msgid ""
-"Enter a category ID, or IDs separated by commas, from which you wish to show "
-"posts. Use this option if you are using a Portfolio or Blog template."
+msgid "Enter a category ID, or IDs separated by commas, from which you wish to show posts. Use this option if you are using a Portfolio or Blog template."
 msgstr ""
 
 #: ../includes/page-options.php:47
@@ -795,7 +602,7 @@ msgstr ""
 
 #: ../includes/popular-posts-widget.php:24
 msgid "Popular"
-msgstr "Sản phẩm bán chạy"
+msgstr ""
 
 #: ../includes/popular-posts-widget.php:96
 #: ../includes/recent-posts-widget.php:111
@@ -824,9 +631,7 @@ msgid "Audio URL"
 msgstr ""
 
 #: ../includes/post-options.php:35
-msgid ""
-"URL of audio for Audio Post Format. Allowed extensions are mp3, mp4, ogg. "
-"Example: http://mysite.com/track1.mp3"
+msgid "URL of audio for Audio Post Format. Allowed extensions are mp3, mp4, ogg. Example: http://mysite.com/track1.mp3"
 msgstr ""
 
 #: ../includes/post-options.php:39
@@ -858,9 +663,7 @@ msgid "Custom markup before the post"
 msgstr ""
 
 #: ../includes/post-options.php:69
-msgid ""
-"Enter an HTML markup or advertisement code that should appear above the "
-"post. (Short codes are supported)."
+msgid "Enter an HTML markup or advertisement code that should appear above the post. (Short codes are supported)."
 msgstr ""
 
 #: ../includes/post-options.php:73
@@ -868,9 +671,7 @@ msgid "Custom markup after the post"
 msgstr ""
 
 #: ../includes/post-options.php:76
-msgid ""
-"Enter an HTML markup or advertisement code that should appear after the "
-"post, below related posts section. (Short codes are supported)."
+msgid "Enter an HTML markup or advertisement code that should appear after the post, below related posts section. (Short codes are supported)."
 msgstr ""
 
 #: ../includes/post-options.php:80
@@ -1034,9 +835,7 @@ msgid "Color Scheme Variation"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:39
-msgid ""
-"Select a color scheme variation for the theme. This will be applied to the "
-"navigation bar, footer and some highlights."
+msgid "Select a color scheme variation for the theme. This will be applied to the navigation bar, footer and some highlights."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:45
@@ -1044,8 +843,7 @@ msgid "Global Sidebar Placement"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:46
-msgid ""
-"Select a global sidebar placement for blog, archives, author, single, etc."
+msgid "Select a global sidebar placement for blog, archives, author, single, etc."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:52
@@ -1053,9 +851,7 @@ msgid "Contact e-mail"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:53
-msgid ""
-"Enter an e-mail address to which mail should be received from contact page. "
-"If left blank, your blog admin email is used."
+msgid "Enter an e-mail address to which mail should be received from contact page. If left blank, your blog admin email is used."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:58
@@ -1063,11 +859,7 @@ msgid "Contact Page custom Markup<br/>(Can be used for Google Maps)"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:59
-msgid ""
-"Visit maps.google.com and copy your map location iFrame code. Paste it here. "
-"This will be shown on contact page template. Recommended dimensions for "
-"iframe <code>width=\"100%\" height=\"320px\"</code><br/>Tip: You can also "
-"use any custom markup or HTML here instead of Google Maps."
+msgid "Visit maps.google.com and copy your map location iFrame code. Paste it here. This will be shown on contact page template. Recommended dimensions for iframe <code>width=\"100%\" height=\"320px\"</code><br/>Tip: You can also use any custom markup or HTML here instead of Google Maps."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:64
@@ -1075,8 +867,7 @@ msgid "Mail Sent Message:"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:65
-msgid ""
-"Enter a message that should be displayed when the mail is successfully sent."
+msgid "Enter a message that should be displayed when the mail is successfully sent."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:67
@@ -1088,9 +879,7 @@ msgid "Custom Footer Text (Left)"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:71
-msgid ""
-"Enter custom text for left side of the footer. You can use <code>HTML</code> "
-"here."
+msgid "Enter custom text for left side of the footer. You can use <code>HTML</code> here."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:76
@@ -1098,9 +887,7 @@ msgid "Custom Footer Text (Right)"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:77
-msgid ""
-"Enter custom text for right side of the footer. You can use <code>HTML</"
-"code> here."
+msgid "Enter custom text for right side of the footer. You can use <code>HTML</code> here."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:82
@@ -1116,10 +903,7 @@ msgid "Hide Secondary Widget Area"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:89
-msgid ""
-"Check to hide secondary widget area on archives, category, search, author "
-"etc. You can control individual setting for Pages and Posts inside their "
-"options panel."
+msgid "Check to hide secondary widget area on archives, category, search, author etc. You can control individual setting for Pages and Posts inside their options panel."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:94
@@ -1127,9 +911,7 @@ msgid "Disable responsive.css file"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:95
-msgid ""
-"Check to disable responsive.css file. Located as <code>xing/responsive.css</"
-"code>"
+msgid "Check to disable responsive.css file. Located as <code>xing/responsive.css</code>"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:100
@@ -1137,10 +919,7 @@ msgid "Disable user.css file"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:101
-msgid ""
-"Check to disable user.css file. Located as <code>xing/user.css</code> This "
-"file can be used to add your custom styles without modifying actual style."
-"css file."
+msgid "Check to disable user.css file. Located as <code>xing/user.css</code> This file can be used to add your custom styles without modifying actual style.css file."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:111
@@ -1152,10 +931,7 @@ msgid "Custom head markup"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:115
-msgid ""
-"Use this section for inserting any custom CSS or script markup inside head "
-"node of the site. For example, Google Analytics code, Google font CSS, or "
-"custom scripts."
+msgid "Use this section for inserting any custom CSS or script markup inside head node of the site. For example, Google Analytics code, Google font CSS, or custom scripts."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:120
@@ -1171,8 +947,7 @@ msgid "Top-right Callout Text"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:127
-msgid ""
-"Enter custom text that should appear on right side of top navigation bar."
+msgid "Enter custom text that should appear on right side of top navigation bar."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:132
@@ -1212,8 +987,7 @@ msgid "Logo Alignment"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:157
-msgid ""
-"Select an alignment for Logo. You can set margins inside style.css file."
+msgid "Select an alignment for Logo. You can set margins inside style.css file."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:168
@@ -1341,10 +1115,7 @@ msgid "Advertisement above the post"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:274
-msgid ""
-"Enter custom HTML or advertisement code that should appear above the post. "
-"Short codes are supported. The markup used here will apply to all posts "
-"globally.<br/>You can override or hide this ad on individual posts."
+msgid "Enter custom HTML or advertisement code that should appear above the post. Short codes are supported. The markup used here will apply to all posts globally.<br/>You can override or hide this ad on individual posts."
 msgstr ""
 
 #: ../includes/theme-admin-options.php:279
@@ -1352,10 +1123,7 @@ msgid "Advertisement below the post"
 msgstr ""
 
 #: ../includes/theme-admin-options.php:280
-msgid ""
-"Enter custom HTML or advertisement code that should appear below the post. "
-"Short codes are supported. The markup used here will apply to all posts "
-"globally.<br/>You can override or hide this ad on individual posts."
+msgid "Enter custom HTML or advertisement code that should appear below the post. Short codes are supported. The markup used here will apply to all posts globally.<br/>You can override or hide this ad on individual posts."
 msgstr ""
 
 #: ../includes/twitter-widget.php:6
@@ -1382,85 +1150,82 @@ msgstr ""
 msgid "Text to appear before tweets:"
 msgstr ""
 
-#: ../templates/page-contact.php:12
+#: ../templates/page-contact.php:11
 msgid "Enter Your Name"
 msgstr ""
 
-#: ../templates/page-contact.php:21
+#: ../templates/page-contact.php:20
 msgid "An email is required"
 msgstr ""
 
-#: ../templates/page-contact.php:24
+#: ../templates/page-contact.php:23
 msgid "Enter a valid email"
 msgstr ""
 
-#: ../templates/page-contact.php:32
+#: ../templates/page-contact.php:31
 msgid "No URL provided"
 msgstr ""
 
-#: ../templates/page-contact.php:36
+#: ../templates/page-contact.php:35
 msgid "Please enter a valid URL"
 msgstr ""
 
-#: ../templates/page-contact.php:45
+#: ../templates/page-contact.php:44
 msgid "A comment is required"
 msgstr ""
 
-#: ../templates/page-contact.php:58
+#: ../templates/page-contact.php:57
 #, php-format
 msgid "Message sent from your website by: %1$s"
 msgstr ""
 
+#: ../templates/page-contact.php:58
+#, php-format
+msgid ""
+"Name: %1$s \\n"
+"Email: %2$s \\n"
+"URL: %3$s \\n"
+"Comments: %4$s"
+msgstr ""
+
 #: ../templates/page-contact.php:59
 #, php-format
-msgid "Name: %1$s \\nEmail: %2$s \\nURL: %3$s \\nComments: %4$s"
+msgid ""
+"From: My WebSite <%1$s>\\r\\n"
+"Reply-To: %2$s"
 msgstr ""
 
-#: ../templates/page-contact.php:60
-#, php-format
-msgid "From: My WebSite <%1$s>\\r\\nReply-To: %2$s"
-msgstr ""
-
-#: ../templates/page-contact.php:89
+#: ../templates/page-contact.php:88
 msgid "Name*"
 msgstr ""
 
-#: ../templates/page-contact.php:90
+#: ../templates/page-contact.php:89
 msgid "E-mail*"
 msgstr ""
 
-#: ../templates/page-contact.php:91
+#: ../templates/page-contact.php:90
 msgid "URL"
 msgstr ""
 
-#: ../templates/page-contact.php:92
+#: ../templates/page-contact.php:91
 msgid "Message*"
 msgstr ""
 
-#: ../templates/page-contact.php:93
+#: ../templates/page-contact.php:92
 msgid "Send Message"
 msgstr ""
 
 #: ../templates/port3-sb-filterable.php:22
-#: ../templates/port4-filterable.php:21
-#: ../templates/port4-sb-filterable.php:22
-#: ../templates/port5-filterable.php:21
 msgid "Filter by"
 msgstr ""
 
-#: ../templates/port3-sb-filterable.php:69 ../templates/port3-sb.php:56
-#: ../templates/port4-filterable.php:68
-#: ../templates/port4-sb-filterable.php:68 ../templates/port4-sb.php:56
-#: ../templates/port4.php:55 ../templates/port5-filterable.php:67
-#: ../templates/port5.php:55
+#: ../templates/port3-sb-filterable.php:69
+#: ../templates/port3-sb.php:56
 msgid "View Image"
 msgstr ""
 
-#: ../templates/port3-sb-filterable.php:69 ../templates/port3-sb.php:56
-#: ../templates/port4-filterable.php:68
-#: ../templates/port4-sb-filterable.php:68 ../templates/port4-sb.php:56
-#: ../templates/port4.php:55 ../templates/port5-filterable.php:67
-#: ../templates/port5.php:55
+#: ../templates/port3-sb-filterable.php:69
+#: ../templates/port3-sb.php:56
 msgid "Permalink"
 msgstr ""
 
@@ -1498,9 +1263,10 @@ msgstr ""
 
 #: ../woocommerce/account-bar.php:29
 msgid "Login / Register"
-msgstr "Đăng nhập/Đăng ký"
+msgstr ""
 
-#: ../woocommerce/account-bar.php:31 ../woocommerce/woocommerce-hooks.php:13
+#: ../woocommerce/account-bar.php:31
+#: ../woocommerce/woocommerce-hooks.php:13
 msgid "View your shopping cart"
 msgstr ""
 
@@ -1540,3 +1306,4 @@ msgstr ""
 #: ../woocommerce/shop/breadcrumb.php:205
 msgid "Page"
 msgstr ""
+

@@ -18,7 +18,9 @@ $s(function() {
         if (insSpanEl.parent().html()) insSpanEl.parent().html().replace('<ins>', '<del>'); //replace
         if (insPEl.parent().html()) insPEl.parent().html().replace('<ins>', '<del>'); //replace
     }
+    
 
+    // Start up popup
     if (params.isHomePage) {
 
         var expDays = 0.25;

@@ -728,8 +728,8 @@ class Woocommerce {
 	            'update_count_callback' => '_update_post_term_count',
 	            'label' 				=> __( 'Product Categories', 'woocommerce'),
 	            'labels' => array(
-	                    'name' 				=> __( 'Product Categories', 'woocommerce'),
-	                    'singular_name' 	=> __( 'Product Category', 'woocommerce'),
+	                    'name' 				=> __( 'Danh mục sản phẩm', 'woocommerce'),
+	                    'singular_name' 	=> __( 'Danh mục sản phẩm', 'woocommerce'),
 						'menu_name'			=> _x( 'Categories', 'Admin menu name', 'woocommerce' ),
 	                    'search_items' 		=> __( 'Search Product Categories', 'woocommerce'),
 	                    'all_items' 		=> __( 'All Product Categories', 'woocommerce'),

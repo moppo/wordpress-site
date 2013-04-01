@@ -51,7 +51,7 @@ class WooCommerce_Widget_Product_Categories extends WP_Widget {
 	function widget( $args, $instance ) {
 		extract( $args );
 
-		$title = apply_filters('widget_title', empty( $instance['title'] ) ? __( 'Product Categories', 'woocommerce' ) : $instance['title'], $instance, $this->id_base);
+		$title = apply_filters('widget_title', empty( $instance['title'] ) ? __( 'Danh mục sản phẩm', 'woocommerce' ) : $instance['title'], $instance, $this->id_base);
 		$c = $instance['count'] ? '1' : '0';
 		$h = $instance['hierarchical'] ? true : false;
 		$s = (isset($instance['show_children_only']) && $instance['show_children_only']) ? '1' : '0';

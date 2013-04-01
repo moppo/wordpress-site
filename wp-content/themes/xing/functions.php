@@ -681,4 +681,12 @@ function load_theme_vars() {
 		}
 	}
 }
-add_action( 'init','load_theme_vars' );?>
+add_action( 'init','load_theme_vars' );
+
+// Remove page title
+add_action( 'get_header', 'child_remove_page_titles' );
+function child_remove_page_titles() {
+if ( is_page() && ! is_page_template( 'page_blog.php' ) )
+  remove_action( 'genesis_post_title', 'genesis_do_post_title' );
+}
+?>

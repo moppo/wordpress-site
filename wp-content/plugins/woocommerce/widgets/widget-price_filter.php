@@ -125,13 +125,14 @@ class WooCommerce_Widget_Price_Filter extends WP_Widget {
 			<div class="price_slider_wrapper">
 				<div class="price_slider" style="display:none;"></div>
 				<div class="price_slider_amount">
-					<input type="text" id="min_price" name="min_price" value="'.esc_attr( $post_min ).'" data-min="'.esc_attr( $min ).'" placeholder="'.__('Min price', 'woocommerce').'" />
-					<input type="text" id="max_price" name="max_price" value="'.esc_attr( $post_max ).'" data-max="'.esc_attr( $max ).'" placeholder="'.__('Max price', 'woocommerce').'" />
-					<button type="submit" class="button">'.__('Filter', 'woocommerce').'</button>
+					<input style="display:none;" type="text" id="min_price" name="min_price" value="'.esc_attr( $post_min ).'" data-min="'.esc_attr( $min ).'" placeholder="'.__('Min price', 'woocommerce').'" />
+					<input style="display:none;" type="text" id="max_price" name="max_price" value="'.esc_attr( $post_max ).'" data-max="'.esc_attr( $max ).'" placeholder="'.__('Max price', 'woocommerce').'" />
 					<div class="price_label" style="display:none;">
-						'.__('Price:', 'woocommerce').' <span class="from"></span> &mdash; <span class="to"></span>
+						'.__('Giá:', 'woocommerce').' <span class="from"></span> &mdash; <span class="to"></span>
 					</div>
 					'.$fields.'
+					<button type="submit" class="button"></button>
+					
 					<div class="clear"></div>
 				</div>
 			</div>

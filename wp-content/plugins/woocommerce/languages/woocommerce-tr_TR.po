@@ -3,13 +3,14 @@ msgstr ""
 "Project-Id-Version: WooCommerce v1.6.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-11-26 16:27+0200\n"
-"PO-Revision-Date: 2012-07-27 15:35:00+0000\n"
+"PO-Revision-Date: 2013-03-31 08:28:50+0000\n"
 "Last-Translator: ManusH <info@ManusH.net>\n"
 "Language-Team: ManusH <info@ManusH.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: CSL v1.x\n"
 "X-Poedit-Language: Turkish\n"
 "X-Poedit-Country: TURKEY\n"
 "X-Poedit-SourceCharset: utf-8\n"
@@ -329,7 +330,7 @@ msgstr "Ürün Kategorisi Ara"
 #: woocommerce.php:589
 #@ woocommerce
 msgid "All Product Categories"
-msgstr "Tüm Ürün Kategorileri"
+msgstr "Danh mục sản phẩm"
 
 #: woocommerce.php:590
 #@ woocommerce
@@ -778,7 +779,7 @@ msgstr "Müşterilerinizin mağazanızdan yapacakları alışverişlerinde kulla
 #: woocommerce-functions.php:117
 #@ woocommerce
 msgid "Logout"
-msgstr "Çıkış"
+msgstr "Thoát"
 
 #: templates/loop/sale-flash.php:10
 #: templates/single-product/sale-flash.php:10
@@ -852,7 +853,7 @@ msgstr "<span class=\"meta-nav\">&larr;</span> Önceki"
 #: templates/emails/customer-processing-order.php:16
 #@ woocommerce
 msgid "Price"
-msgstr "Fiyat"
+msgstr "Giá"
 
 #: classes/gateways/cod/class-wc-cod.php:59
 #: classes/gateways/mijireh/class-wc-mijireh-checkout.php:172
@@ -867,14 +868,14 @@ msgstr "Açıklama"
 #: templates/single-product/tabs/tab-attributes.php:7
 #@ woocommerce
 msgid "Additional Information"
-msgstr "Ek Bilgi"
+msgstr "Thông tin sản phẩm"
 
 #: admin/post-types/writepanels/writepanels-init.php:45
 #: templates/single-product/tabs/tab-reviews.php:2
 #: templates/single-product-reviews.php:37
 #@ woocommerce
 msgid "Reviews"
-msgstr "Yorumlar"
+msgstr "Đánh giá"
 
 #: templates/single-product/tabs/description.php:11
 #@ woocommerce
@@ -885,7 +886,7 @@ msgstr "Ürün Açıklaması"
 #: templates/single-product/related.php:29
 #@ woocommerce
 msgid "Related Products"
-msgstr "İlgili Ürünler"
+msgstr "Sản phẩm cùng loại"
 
 #: templates/cart/shipping-calculator.php:14
 #@ woocommerce
@@ -1265,7 +1266,7 @@ msgstr "Mağaza İçeriği"
 #: woocommerce.php:585
 #@ woocommerce
 msgid "Product Categories"
-msgstr "Ürün Kategorileri"
+msgstr "Danh mục sản phẩm"
 
 #: widgets/widget-product_tag_cloud.php:42
 #: woocommerce.php:614
@@ -1317,7 +1318,7 @@ msgstr "Toplam:"
 #: admin/woocommerce-admin-dashboard.php:268
 #@ woocommerce
 msgid "There are no product reviews yet."
-msgstr "Henüz ürünler için yorum yapılmamış."
+msgstr "Chưa có đánh giá nào."
 
 #. translators: plugin header field 'Name'
 #: admin/woocommerce-admin-init.php:26
@@ -1453,7 +1454,7 @@ msgstr "hesabim"
 #: templates/checkout/thankyou.php:26
 #@ woocommerce
 msgid "My Account"
-msgstr "Hesabım"
+msgstr "Thông tin tài khoản"
 
 #: admin/woocommerce-admin-install.php:176
 #@ woocommerce
@@ -3292,7 +3293,7 @@ msgstr "Bu varyasyon için Stok Kodu girin yada ana ürünün Stok Kodunu kullan
 #: templates/single-product/product-attributes.php:22
 #@ woocommerce
 msgid "Weight"
-msgstr "Ağırlık"
+msgstr "Nặng"
 
 #: admin/post-types/writepanels/writepanel-product-type-variable.php:178
 #: admin/post-types/writepanels/writepanel-product-type-variable.php:386
@@ -3311,7 +3312,7 @@ msgstr "Stok Miktarı:"
 #: widgets/widget-price_filter.php:192
 #@ woocommerce
 msgid "Price:"
-msgstr "Fiyat:"
+msgstr "Giá:"
 
 #: admin/post-types/writepanels/writepanel-product-type-variable.php:173
 #: admin/post-types/writepanels/writepanel-product-type-variable.php:381
@@ -3417,7 +3418,7 @@ msgstr "İndirimli Fiyat Tarih Aralığı"
 #: templates/single-product/product-attributes.php:31
 #@ woocommerce
 msgid "Dimensions"
-msgstr "Boyutlar"
+msgstr "Kích thước"
 
 #: admin/post-types/product.php:527
 #: admin/post-types/product.php:772
@@ -6157,7 +6158,7 @@ msgstr "İlk yorumlayan siz olun:"
 #: templates/single-product-reviews.php:66
 #@ woocommerce
 msgid "There are no reviews yet, would you like to <a href=\"#review_form\" class=\"inline show_review_form\">submit yours</a>?"
-msgstr "Bu ürüne henüz yorum yapılmamış. Siz <a href=\"#review_form\" class=\"inline show_review_form\">Yorum Yapmak </a> ister misiniz?"
+msgstr "Chưa có đánh giá nào, Bạn muốn <a href=\"#review_form\" class=\"inline show_review_form\">đăng nhận xét của bạn</a>?"
 
 #: admin/post-types/writepanels/writepanel-order_data.php:135
 #: admin/woocommerce-admin-users.php:145
@@ -6456,17 +6457,17 @@ msgstr "Müşteri Girişi"
 #, php-format
 #@ woocommerce
 msgid "Welcome %s"
-msgstr "Sayın %s , Hoşgeldiniz!"
+msgstr "Chào %s"
 
 #: widgets/widget-login.php:56
 #@ woocommerce
 msgid "My account"
-msgstr "Hesabım"
+msgstr "Thông tin tài khoản"
 
 #: widgets/widget-login.php:57
 #@ woocommerce
 msgid "Change my password"
-msgstr "Şifre Değiştir"
+msgstr "Đổi mật khẩu"
 
 #: widgets/widget-login.php:97
 #@ woocommerce
@@ -6511,12 +6512,12 @@ msgstr "WooCommerce- Fiyat Süzgeci"
 #: widgets/widget-price_filter.php:190
 #@ woocommerce
 msgid "Filter"
-msgstr "Filtrele"
+msgstr "Tìm kiếm"
 
 #: widgets/widget-price_filter.php:205
 #@ woocommerce
 msgid "Filter by price"
-msgstr "Fiyat Aralığı Filtresi"
+msgstr "Tìm kiếm theo giá"
 
 #: widgets/widget-product_categories.php:25
 #@ woocommerce
@@ -7312,7 +7313,7 @@ msgstr "Dosyayı indir &rarr;"
 #: templates/single-product/meta.php:14
 #@ woocommerce
 msgid "Category:"
-msgstr "Kategori:"
+msgstr "Mục"
 
 #: templates/single-product/meta.php:16
 #@ woocommerce
@@ -9182,25 +9183,25 @@ msgstr ""
 #: templates/loop/sorting.php:10
 #@ woocommerce
 msgid "Default sorting"
-msgstr ""
+msgstr "Theo mặc định"
 
 #: admin/settings/settings-init.php:543
 #: templates/loop/sorting.php:11
 #@ woocommerce
 msgid "Sort alphabetically"
-msgstr ""
+msgstr "Theo tên sp a-z"
 
 #: admin/settings/settings-init.php:544
 #: templates/loop/sorting.php:12
 #@ woocommerce
 msgid "Sort by most recent"
-msgstr ""
+msgstr "Theo sp bán chạy"
 
 #: admin/settings/settings-init.php:545
 #: templates/loop/sorting.php:13
 #@ woocommerce
 msgid "Sort by price"
-msgstr ""
+msgstr "Theo giá"
 
 #: admin/settings/settings-init.php:551
 #@ woocommerce

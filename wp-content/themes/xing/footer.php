@@ -54,7 +54,7 @@ if ( is_active_sidebar( 'secondary-column-1' ) || is_active_sidebar( 'secondary-
 <div id="footer" role="contentinfo">
     <div class="wrap clearfix">
         <div class="notes_left"><?php echo stripslashes($xng_footer_left); ?></div><!-- .notes_left -->
-        <div class="notes_right">Powered by <a href="http://www.mafiashare.net">Wordpress</a></div><!-- .notes_right -->
+        <!--<div class="notes_right">Powered by <a href="http://www.mafiashare.net">Wordpress</a></div>--><!-- .notes_right -->
     </div><!-- #footer wrap -->
 </div><!-- #footer -->
 <?php if( $xng_layout != 'stretched' ) {

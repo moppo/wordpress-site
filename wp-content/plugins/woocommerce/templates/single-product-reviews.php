@@ -43,7 +43,7 @@ global $woocommerce;
 
 	else :
 
-		echo '<h2>'.__('Reviews', 'woocommerce').'</h2>';
+		echo '<h2>'.__('Đánh giá', 'woocommerce').'</h2>';
 
 	endif;
 

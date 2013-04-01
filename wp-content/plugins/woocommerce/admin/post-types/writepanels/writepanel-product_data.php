@@ -78,7 +78,7 @@ function woocommerce_product_data_box() {
 
 			<li class="shipping_tab hide_if_virtual shipping_options hide_if_grouped hide_if_external"><a href="#shipping_product_data"><?php _e('Shipping', 'woocommerce'); ?></a></li>
 
-			<li class="related_product_tab related_product_options"><a href="#related_product_data"><?php _e('Related Products', 'woocommerce'); ?></a></li>
+			<li class="related_product_tab related_product_options"><a href="#related_product_data"><?php _e('Sản phẩm cùng loại', 'woocommerce'); ?></a></li>
 
 			<li class="attributes_tab attribute_options"><a href="#woocommerce_attributes"><?php _e('Attributes', 'woocommerce'); ?></a></li>
 
