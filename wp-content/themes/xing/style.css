@@ -109,7 +109,7 @@ img { width:auto; max-width:100%; display:block }
 box-shadow:0 0 0 1px rgba(0,0,0,0.07);
 }
 .wrap { position:relative; width:960px; margin:0 auto; text-align:left }
-#header { position:relative; background:#fff; width:100% }
+#header { position:relative; background:#fff; width:100%; margin-bottom: -22px; }
 #header .wrap { width:1000px }
 #primary { position:relative; padding:0 0 20px; background:#fff; text-align:center }
 #primary .wrap { width:980px; padding:20px 0 0 }
@@ -174,7 +174,8 @@ ul.account-nav li a.log_in, ul.account-nav li a.log_out { border:none; padding-r
 /* Logo and Blog Name */
 .brand { position:relative; overflow:hidden; float:left; width:auto; margin:0; padding:25px 0 25px 20px }
 .brand.right { float:right; padding-left:0; padding-right:20px }
-.brand.no-callout { padding-top:0; margin-top:20px }
+.brand.no-callout { padding-top:0; margin-top:-3px }
+.brand.no-callout img {width: 152px;}
 .brand.right.no-callout { padding-top:25px; margin-top:0px }
 .brand h1 { margin:0 }
 .brand h2#site-description { font-size:12px; line-height:18px; margin-bottom:0; color:#777 }
@@ -184,7 +185,7 @@ ul.account-nav li a.log_in, ul.account-nav li a.log_out { border:none; padding-r
 .blogname a:hover { text-decoration:none }
 
 /* Header Widget Area */
-.header-widget-area { position:relative; overflow:hidden; float:right; padding:0 20px 0 0; margin:5px 0 15px 0; width:320px; text-align:right; text-shadow:0 1px 0 rgba(255,255,255,0.3) }
+.header-widget-area { position:relative; overflow:hidden; float:right; padding:0 20px 0 0; margin:5px 0 15px 0; width:370px; text-align:right; text-shadow:0 1px 0 rgba(255,255,255,0.3) }
 .hwa_wrap { position:relative; overflow:hidden; display:block; margin-bottom:10px }
 .header-widget-area .hwa_wrap * { margin-bottom:0 }
 .header-widget-area.left { text-align:left; padding-right:0; padding-left:20px }
@@ -787,7 +788,7 @@ border-radius:2px
 .quote { position:relative; overflow:hidden; padding:12px 12px 12px 15px; margin-bottom:12px; background:#f9f9f9; color:#444; font-size:12px; font-family:Georgia, "Bitstream Charter", serif; text-shadow:0 1px 0 rgba(255, 255, 255, 0.5); border-left:1px solid #e5e5e5 }
 
 /* Logo Grid */
-ul.logo_grid { margin:0; padding:0; list-style:none; position:relative; overflow:hidden }
+ul.logo_grid { margin:0; padding:0; list-style:none; position:relative; overflow:hidden; width: 125px; }
 ul.logo_grid li { float:left; margin:0 18px 18px 0; line-height:0 }
 ul.logo_grid li:last-child { margin-right:0 }
 
@@ -928,6 +929,6 @@ div#popup-content { width:670px; float:left; padding:5px; }
 /* start up popup */
 
 /* Hotline and Chat section */
-div.textwidget {float: left;}
+div.textwidget {float: left; width: 245px;}
 div.flexytalk {margin: 10px 0 10px 0; height: 22px;}
 div.ui-widget-header {padding: 0 0 0 0 !important;}

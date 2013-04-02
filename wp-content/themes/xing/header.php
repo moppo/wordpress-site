@@ -74,7 +74,7 @@ $new_body_class .= ( $xng_top_bar_hide != 'true' ) ? ' no-border' : ''; ?>
                     </hgroup>
                     <?php }
                     else { ?>
-                    <h1><a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php if ( $xng_logo != '' ) echo $xng_logo; else echo ( $dir.'/images/logo.png' ); ?>" alt="<?php bloginfo('name'); ?>" /></a></h1>
+                    <h1><a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php if ( $xng_logo != '' ) echo $xng_logo; else echo ( $dir.'/images/quocdat_logo3.jpg' ); ?>" alt="<?php bloginfo('name'); ?>" /></a></h1>
                     <?php } ?>
                 </div><!-- .brand -->
                 <?php get_template_part('includes/header-widget-area'); ?>
