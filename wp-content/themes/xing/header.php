@@ -33,11 +33,7 @@ $new_body_class .= ( $xng_top_bar_hide != 'true' ) ? ' no-border' : ''; ?>
     <!-- start up popup -->
     <div id="popup-bg"></div>
     <div id="popup">
-        <div id="popup-header">
-            <span id="popup-close" title="Close">
-                X
-            </span>
-        </div>
+        
         <div id="popup-content">
             <img style="width:650px" src="/samsung_lap.jpeg">
         </div>
